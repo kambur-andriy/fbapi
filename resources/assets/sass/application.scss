@@ -1,0 +1,34 @@
+// Fonts
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import "../font/scss/font-awesome";
+
+@import "variables";
+@import "forms";
+
+.fb-button {
+    display: block;
+    width: 100%;
+
+    color: #fff;
+    background-color: #4267B2 !important;
+
+    .fa-facebook {
+        margin-right: 15px;
+    }
+}
+
+.account-section {
+
+    .account-action {
+        display: flex;
+        align-items: center;
+
+        height: 300px;
+    }
+}
+
+.footer-copyright {
+    .container {
+        text-align: center;
+    }
+}
