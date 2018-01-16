@@ -10,6 +10,7 @@ use App\Models\DB\DebitCard;
 use App\Models\DB\Document;
 use App\Models\DB\Invite;
 use App\Models\DB\Profile;
+use App\Models\DB\SocialNetworkAccount;
 use App\Models\DB\State;
 use App\Models\DB\User;
 use App\Models\DB\Verification;
@@ -47,15 +48,17 @@ class UserController extends Controller
         // Profile
         $profile = $user->profile;
 
-        // Ad Account
-        $adAccount = $user->advertisingAccount;
+        // FB Account
+        $fbAccount = SocialNetworkAccount::where('user_id', $user->id)
+            ->where('network', SocialNetworkAccount::SOCIAL_NETWORK_FACEBOOK)
+            ->first();;
 
         return view(
             'user.profile',
             [
                 'user' => $user,
                 'profile' => $profile,
-                'adAccount' => $adAccount
+                'adAccount' => $fbAccount
             ]
         );
     }

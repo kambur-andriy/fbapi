@@ -11,27 +11,15 @@
 
     <div class="section">
 
-        <form id="adv_account_form" class="col s12 m12 l8 xl-8 offset-m2 offset-xl2">
+        <form id="profile_form" class="col s12 m12 l8 xl-8 offset-m2 offset-xl2">
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">assignment</i>
-                    <input name="account_id" type="text" class="validate" value="{{ $adAccount->account_id }}">
+                    <i class="material-icons prefix">face</i>
+                    <input name="account_id" type="text" class="validate" value="{{ $adAccount->account_id }}" readonly>
                     <label for="account_id">Account ID</label>
                 </div>
             </div>
-
-            <button class="btn waves-effect waves-light right grey" type="submit" name="action">
-                Save Account ID
-            </button>
-
-        </form>
-
-    </div>
-
-    <div class="section">
-
-        <form id="profile_form" class="col s12 m12 l8 xl-8 offset-m2 offset-xl2">
 
             <div class="row">
                 <div class="input-field col s12">

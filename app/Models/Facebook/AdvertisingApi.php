@@ -22,11 +22,11 @@ class AdvertisingApi
      *
      * Init FB Adv API
      */
-    public function __construct($accountID)
+    public function __construct($accountID, $accessToken)
     {
         $appID = env('FB_CLIENT_ID', '');
         $appSecret = env('FB_CLIENT_SECRET', '');
-        $accessToken = 'EAAHw6rFh6WIBALd70GfXwz6ZBQc8srnWFR79rlZCl2YYHeEemyEsXJ2nYPlrQNyeT8ZBOg0aGgigLsRFWqwKhKOrakei1LCtBGK7xlFc0hz7TYihhgaprchziuuT8k8ioJC5oICqZAsWBJ7L9wvsAZBjvMD3jPASEYdY4Ij6ad7YdY43w1cvRZCcQTcDhGzeF7YFvP4y2pu6UP3SKNGCCoZAERQvXZCz3e0ZD';
+//        $accessToken = 'EAAHw6rFh6WIBALd70GfXwz6ZBQc8srnWFR79rlZCl2YYHeEemyEsXJ2nYPlrQNyeT8ZBOg0aGgigLsRFWqwKhKOrakei1LCtBGK7xlFc0hz7TYihhgaprchziuuT8k8ioJC5oICqZAsWBJ7L9wvsAZBjvMD3jPASEYdY4Ij6ad7YdY43w1cvRZCcQTcDhGzeF7YFvP4y2pu6UP3SKNGCCoZAERQvXZCz3e0ZD';
 
         Api::init($appID, $appSecret, $accessToken);
 

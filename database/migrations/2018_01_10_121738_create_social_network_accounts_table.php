@@ -17,7 +17,7 @@ class CreateSocialNetworkAccountsTable extends Migration
             $table->increments('id');
             $table->integer('network');
             $table->string('account_id');
-            $table->string('account_token');
+            $table->text('account_token');
             $table->integer('user_id');
             $table->timestamps();
         });
