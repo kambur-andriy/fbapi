@@ -43,7 +43,7 @@
                 <div class="row">
 
                     <button class="btn waves-effect waves-light right grey" type="submit" name="action">
-                        Submit
+                        Sign In
                     </button>
 
                 </div>

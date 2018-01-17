@@ -6,18 +6,16 @@ use App\Mail\ActivateAccount;
 use App\Mail\ResetPassword;
 use App\Models\DB\AdvertisingAccount;
 use App\Models\DB\PasswordReset;
-use App\Models\DB\Profile;
-use App\Models\DB\SocialNetworkAccount;
 use App\Models\DB\Verification;
 use App\Models\DB\Wallet;
 use App\Models\DB\User;
+use App\Models\Processors\Account;
 use App\Models\Validation\ValidationMessages;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
 use Mockery\Exception;
 
@@ -66,11 +64,10 @@ class AccountController extends Controller
 
         try {
 
-            $this->createUser(
+            Account::addUser(
                 [
                     'email' => $email,
                     'password' => User::hashPassword($password),
-                    'uid' => uniqid()
                 ]
             );
 
@@ -143,7 +140,7 @@ class AccountController extends Controller
 
         return response()->json(
             [
-                'userPage' => $this->getUserPage(Auth::user()->role)
+                'userPage' => Account::getUserPage(Auth::user()->role)
             ]
         );
     }
@@ -307,57 +304,6 @@ class AccountController extends Controller
     }
 
     /**
-     * Create user with profile and wallet
-     *
-     * @param array $userInfo
-     *
-     * @return array
-     */
-    protected function createUser($userInfo)
-    {
-
-        $user = User::create($userInfo);
-
-        Profile::create(
-            [
-                'user_id' => $user['id']
-            ]
-        );
-
-        AdvertisingAccount::create(
-            [
-                'user_id' => $user['id']
-            ]
-        );
-
-        return $user;
-    }
-
-    /**
-     * Return user home page
-     *
-     * @param int $userRole
-     *
-     * @return string
-     */
-    protected function getUserPage($userRole)
-    {
-        switch ($userRole) {
-            case User::USER_ROLE_ADMIN:
-                return '/admin/users';
-
-            case User::USER_ROLE_MANAGER:
-                return '/admin/users';
-
-            case User::USER_ROLE_USER:
-                return '/user/profile';
-
-            default:
-                return '/';
-        }
-    }
-
-    /**
      * Redirect to Facebook
      * @return redirect
      */
@@ -378,42 +324,8 @@ class AccountController extends Controller
         try {
 
             $snUser = Socialite::driver('facebook')->user();
-            $snUserID = $snUser->getId();
-            $snUserToken = $snUser->token;
-            $network = SocialNetworkAccount::SOCIAL_NETWORK_FACEBOOK;
 
-            $snAccount = SocialNetworkAccount::where('account_id', $snUserID)->where('network', $network)->first();
-
-            if (!$snAccount) {
-
-                // register a new User
-                $userInfo = $this->createUser(
-                    [
-                        'email' => $snUser->email,
-                        'password' => User::hashPassword(uniqid()),
-                    ]
-                );
-
-                //create social network account
-                SocialNetworkAccount::create(
-                    [
-                        'network_id' => $network,
-                        'account_id' => $snUserID,
-                        'account_token' => $snUserToken,
-                        'user_id' => $userInfo->id
-                    ]
-                );
-
-                $userID = $userInfo['id'];
-
-            } else {
-
-                $snAccount->account_token = $snUserToken;
-                $snAccount->save();
-
-                $userID = $snAccount->user()->id;
-
-            }
+            $userID = Account::processFBUser($snUser);
 
             $isAuthorized = Auth::loginUsingId($userID);
 
