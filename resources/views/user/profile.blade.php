@@ -15,8 +15,8 @@
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">face</i>
-                    <input name="account_id" type="text" class="validate" value="{{ $adAccount->account_id }}" readonly>
+                    <i class="material-icons prefix">label_outline</i>
+                    <input name="account_id" type="text" value="{{ $adAccount->account_id }}" readonly>
                     <label for="account_id">Account ID</label>
                 </div>
             </div>

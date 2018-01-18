@@ -67,7 +67,7 @@ class AccountController extends Controller
             Account::addUser(
                 [
                     'email' => $email,
-                    'password' => User::hashPassword($password),
+                    'password' => $password,
                 ]
             );
 
@@ -278,7 +278,7 @@ class AccountController extends Controller
                 throw new \Exception('Error changing password');
             }
 
-            $user->password = User::hashPassword($request->password);
+            $user->password = $request->password;
             $user->save();
 
             PasswordReset::where('email', $user->email)->delete();
@@ -320,6 +320,7 @@ class AccountController extends Controller
      */
     public function FacebookProviderCallback()
     {
+        DB::beginTransaction();
 
         try {
 
@@ -335,9 +336,13 @@ class AccountController extends Controller
 
         } catch (\Exception $e) {
 
+            DB::rollback();
+
             return redirect()->action('IndexController@main');
 
         }
+
+        DB::commit();
 
         return redirect()->action('UserController@profile');
     }

@@ -101,43 +101,6 @@ $(document).ready(function () {
         }
     );
 
-    // FB Account
-    $('#adv_account_form').on(
-        'submit',
-        function (event) {
-            event.preventDefault();
-
-            const credentials = {
-                account_id: $(this).find('input[name="account_id"]').val().trim()
-            };
-
-            axios.post(
-                '/user/account',
-                qs.stringify(credentials)
-            )
-                .then(
-                    () => {
-                        showMessage('Account ID successfully saved.');
-                    }
-                )
-                .catch(
-                    error => {
-
-                        const {errors} = error.response.data;
-
-                        $.each(
-                            errors,
-                            (field, error) => {
-                                if (error.length) {
-                                    showError(error);
-                                }
-                            }
-                        )
-                    }
-                )
-        }
-    );
-
     // Ad Company
     $('#company_form').on(
         'submit',

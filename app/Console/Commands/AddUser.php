@@ -46,7 +46,7 @@ class AddUser extends Command
         $user = Account::addUser(
             [
                 'email' => $email,
-                'password' => User::hashPassword($password),
+                'password' => $password,
             ]
         );
 

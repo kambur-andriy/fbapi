@@ -13,7 +13,7 @@ class Account
     /**
      * Create user acconut
      *
-     * @return array
+     * @return User
      */
     public static function addUser($userInfo)
     {
@@ -28,7 +28,6 @@ class Account
         return $user;
     }
 
-
     /**
      * Process FB user
      *
@@ -39,7 +38,6 @@ class Account
     public static function processFBUser($fbUserInfo)
     {
         $fbAccount = self::getFBUser($fbUserInfo);
-
 
         if (is_null($fbAccount)) {
 
@@ -75,23 +73,22 @@ class Account
     /**
      * Create FB user acconut
      *
-     * @param array $userInfo
      * @param array $fbUserInfo
      *
-     * @return array
+     * @return User
      */
     public static function addFBUser($fbUserInfo)
     {
         $user = self::addUser(
             [
                 'email' => $fbUserInfo->email,
-                'password' => User::hashPassword(uniqid()),
+                'password' => uniqid(),
             ]
         );
 
         SocialNetworkAccount::create(
             [
-                'network_id' => SocialNetworkAccount::SOCIAL_NETWORK_FACEBOOK,
+                'network' => SocialNetworkAccount::SOCIAL_NETWORK_FACEBOOK,
                 'account_id' => $fbUserInfo->getId(),
                 'account_token' => $fbUserInfo->token,
                 'user_id' => $user->id
@@ -124,6 +121,5 @@ class Account
                 return '/';
         }
     }
-
 
 }

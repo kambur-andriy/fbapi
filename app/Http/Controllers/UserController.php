@@ -15,6 +15,7 @@ use App\Models\DB\State;
 use App\Models\DB\User;
 use App\Models\DB\Verification;
 use App\Models\Facebook\AdvertisingApi;
+use App\Models\Facebook\CampaignsAPI;
 use App\Models\Validation\ValidationMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,11 +29,24 @@ use Mockery\Exception;
 class UserController extends Controller
 {
     /**
+     * Authorized user
+     */
+    protected $user;
+
+    /**
      * UserController constructor.
      */
     public function __construct()
     {
         $this->middleware('auth');
+
+        $this->middleware(
+            function ($request, $next) {
+                $this->user = Auth::user();
+
+                return $next($request);
+            }
+        );
     }
 
     /**
@@ -42,21 +56,15 @@ class UserController extends Controller
      */
     public function profile()
     {
-        // User
-        $user = Auth::user();
-
         // Profile
-        $profile = $user->profile;
+        $profile = $this->user->profile;
 
         // FB Account
-        $fbAccount = SocialNetworkAccount::where('user_id', $user->id)
-            ->where('network', SocialNetworkAccount::SOCIAL_NETWORK_FACEBOOK)
-            ->first();;
+        $fbAccount = $this->user->socialNetworkAccount;
 
         return view(
             'user.profile',
             [
-                'user' => $user,
                 'profile' => $profile,
                 'adAccount' => $fbAccount
             ]
@@ -89,9 +97,7 @@ class UserController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = Auth::user();
-
-            $profile = $user->profile;
+            $profile = $this->user->profile;
 
             if (!$profile) {
                 throw new \Exception('Error updating profile');
@@ -124,68 +130,6 @@ class UserController extends Controller
         );
     }
 
-
-    /**
-     * Save FB Adv account
-     *
-     * @param Request $request
-     *
-     * @return JSON
-     */
-    public function saveAccount(Request $request)
-    {
-        $this->validate(
-            $request,
-            [
-                'account_id' => 'required|string',
-            ],
-            ValidationMessages::getList(
-                [
-                    'account_id' => 'Account Name',
-                ]
-            )
-        );
-
-        DB::beginTransaction();
-
-        try {
-            $user = Auth::user();
-
-            $accountID = $request->input('account_id', '');
-
-            $adAccount = $user->advertisingAccount;
-
-            if (!$adAccount) {
-                throw new \Exception('Error saving account');
-            }
-
-            $adAccount->account_id = $accountID;
-
-            $adAccount->save();
-
-        } catch (\Exception $e) {
-
-            DB::rollback();
-
-            return response()->json(
-                [
-                    'message' => 'Error saving FB advertising account',
-                    'errors' => [
-                        'account_name' => 'Error saving FB advertising account',
-                    ]
-                ],
-                422
-            );
-        }
-
-        DB::commit();
-
-        return response()->json(
-            []
-        );
-
-    }
-
     /**
      * User Ad Companies
      *
@@ -193,25 +137,22 @@ class UserController extends Controller
      */
     public function companies()
     {
-        // User
-        $user = Auth::user();
-
         // Ad Account
-        $adAccount = $user->advertisingAccount;
+        $fbAccount = $this->user->socialNetworkAccount;
 
-        if (!$adAccount || empty($adAccount->account_id)) {
+        if (is_null($fbAccount)) {
             return view(
                 'user.no-account'
             );
         }
 
-        $adApi = new AdvertisingApi($adAccount->account_id);
-        $adCompanies = $adApi->getCompanies();
+        $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adCompanies = $adApi->getCampaigns();
 
         return view(
             'user.companies',
             [
-                'objectives' => AdvertisingApi::getCompanyObjectives(),
+                'objectives' => CampaignsAPI::getCampaignObjectives(),
                 'adCompanies' => $adCompanies,
             ]
         );

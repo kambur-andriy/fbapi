@@ -18,7 +18,7 @@ class SocialNetworkAccount extends Model
      * @var array
      */
     protected $fillable = [
-        'social_network_id', 'user_token', 'user_id'
+       'network', 'account_id', 'account_token', 'user_id'
     ];
 
     /**

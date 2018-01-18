@@ -16,7 +16,6 @@ class User extends Authenticatable
     const USER_ROLE_MANAGER = 1;
     const USER_ROLE_USER = 2;
 
-
     /**
      * The attributes that are mass assignable.
      *
@@ -80,6 +79,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Store password as bcrypt() value
+     *
+     * @param $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
      * Get user's Profile
      */
     public function profile() {
@@ -87,26 +96,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate password hash
-     *
-     * @param string $password
-     *
-     * @return string
+     * Get user's Social Network Account
      */
-    public static function hashPassword($password) {
-        return bcrypt($password);
-    }
-
-    /**
-     * Check password with existing hash
-     *
-     * @param string $password
-     * @param string $hash
-     *
-     * @return bool
-     */
-    public static function checkPassword($password, $hash) {
-        return password_verify($password, $hash);
+    public function socialNetworkAccount() {
+        return $this->hasOne('App\Models\DB\SocialNetworkAccount', 'user_id', 'id');
     }
 
 }
