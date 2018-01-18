@@ -31,8 +31,12 @@ Route::group(['prefix' => 'user'], function () {
     Route::post('profile', 'UserController@saveProfile');
     Route::post('account', 'UserController@saveAccount');
 
-    Route::get('companies', 'UserController@companies');
-    Route::post('company', 'UserController@saveCompany');
+    Route::get('campaigns', 'UserController@campaigns');
+    Route::post('campaign', 'UserController@createCampaign');
+
+    Route::get('sets', 'UserController@sets');
+    Route::post('set', 'UserController@createSet');
+
 });
 
 

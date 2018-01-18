@@ -2,7 +2,7 @@
 
 @section('main-menu')
     <li class="active"><a href="profile">Profile</a></li>
-    <li><a href="companies">Companies</a></li>
+    <li><a href="campaigns">Campaigns</a></li>
     <li><a href="sets">Sets</a></li>
     <li><a href="advertising">Advertising</a></li>
 @endsection

@@ -2,7 +2,7 @@
 
 @section('main-menu')
     <li><a href="profile">Profile</a></li>
-    <li class="active"><a href="companies">Companies</a></li>
+    <li class="active"><a href="campaigns">Campaigns</a></li>
     <li><a href="sets">Sets</a></li>
     <li><a href="advertising">Advertising</a></li>
 @endsection
@@ -15,16 +15,16 @@
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">change_history</i>
+                    <i class="material-icons prefix">chat_bubble_outline</i>
                     <input name="name" type="text" class="validate">
-                    <label for="account_id">Name</label>
+                    <label for="name">Name</label>
                 </div>
             </div>
 
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">subject</i>
+                    <i class="material-icons prefix">chevron_right</i>
 
                     <select name="objective">
                         @foreach($objectives as $objectiveID => $objectiveName)
@@ -37,7 +37,7 @@
             </div>
 
             <button class="btn waves-effect waves-light right grey" type="submit" name="action">
-                Save Campaign
+                Create Campaign
             </button>
 
         </form>
@@ -51,13 +51,15 @@
             <tr>
                 <th>Name</th>
                 <th>Objective</th>
+                <th>Status</th>
             </tr>
             </thead>
             <tbody>
-            @foreach($adCompanies as $adCompany)
-                <tr>
-                    <td> {{ $adCompany->name }} </td>
-                    <td> {{ $adCompany->objective }} </td>
+            @foreach($adCampaigns as $adCampaign)
+                <tr id="{{ $adCampaign->id }}">
+                    <td> {{ $adCampaign->name }} </td>
+                    <td> {{ $adCampaign->objective }} </td>
+                    <td> {{ $adCampaign->status }} </td>
                 </tr>
             @endforeach
             </tbody>

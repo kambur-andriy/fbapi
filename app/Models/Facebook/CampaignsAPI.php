@@ -3,7 +3,6 @@
 namespace App\Models\Facebook;
 
 use FacebookAds\Object\AdAccount;
-use FacebookAds\Object\Values\ArchivableCrudObjectEffectiveStatuses;
 use FacebookAds\Object\Campaign;
 use FacebookAds\Object\Fields\CampaignFields;
 use FacebookAds\Object\Values\CampaignObjectiveValues;
@@ -13,7 +12,7 @@ class CampaignsAPI extends AdvertisingApi
     /**
      * Get Ad Companies for Account
      *
-     * return array
+     * return FacebookAds\Cursor
      */
     public function getCampaigns()
     {
@@ -21,14 +20,10 @@ class CampaignsAPI extends AdvertisingApi
 
         $campaigns = $account->getCampaigns(
             [
+                CampaignFields::ID,
                 CampaignFields::NAME,
                 CampaignFields::OBJECTIVE,
-            ],
-            [
-                CampaignFields::EFFECTIVE_STATUS => array(
-                    ArchivableCrudObjectEffectiveStatuses::ACTIVE,
-                    ArchivableCrudObjectEffectiveStatuses::PAUSED,
-                ),
+                CampaignFields::STATUS,
             ]
         );
 
@@ -71,16 +66,16 @@ class CampaignsAPI extends AdvertisingApi
             CampaignObjectiveValues::APP_INSTALLS => 'APP INSTALLS',
             CampaignObjectiveValues::BRAND_AWARENESS => 'BRAND AWARENESS',
             CampaignObjectiveValues::CONVERSIONS => 'CONVERSIONS',
-            CampaignObjectiveValues::EVENT_RESPONSES => 'EVENT_RESPONSES',
+            CampaignObjectiveValues::EVENT_RESPONSES => 'EVENT RESPONSES',
             CampaignObjectiveValues::LEAD_GENERATION => 'LEAD GENERATION',
             CampaignObjectiveValues::LINK_CLICKS => 'LINK CLICKS',
             CampaignObjectiveValues::LOCAL_AWARENESS => 'LOCAL AWARENESS',
             CampaignObjectiveValues::OFFER_CLAIMS => 'OFFER CLAIMS',
             CampaignObjectiveValues::PAGE_LIKES => 'PAGE LIKES',
             CampaignObjectiveValues::POST_ENGAGEMENT => 'POST ENGAGEMENT',
-            CampaignObjectiveValues::PRODUCT_CATALOG_SALES => 'PRODUCT CATALOG_SALES',
+            CampaignObjectiveValues::PRODUCT_CATALOG_SALES => 'PRODUCT CATALOG SALES',
             CampaignObjectiveValues::REACH => 'REACH',
-            CampaignObjectiveValues::VIDEO_VIEWS => 'VIDEO_VIEWS',
+            CampaignObjectiveValues::VIDEO_VIEWS => 'VIDEO VIEWS',
 
         ];
     }

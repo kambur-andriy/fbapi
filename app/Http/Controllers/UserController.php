@@ -16,6 +16,7 @@ use App\Models\DB\User;
 use App\Models\DB\Verification;
 use App\Models\Facebook\AdvertisingApi;
 use App\Models\Facebook\CampaignsAPI;
+use App\Models\Facebook\SetsAPI;
 use App\Models\Validation\ValidationMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,11 +132,11 @@ class UserController extends Controller
     }
 
     /**
-     * User Ad Companies
+     * User Ad Campaigns
      *
      * @return View
      */
-    public function companies()
+    public function campaigns()
     {
         // Ad Account
         $fbAccount = $this->user->socialNetworkAccount;
@@ -147,25 +148,25 @@ class UserController extends Controller
         }
 
         $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
-        $adCompanies = $adApi->getCampaigns();
+        $adCampaigns = $adApi->getCampaigns();
 
         return view(
-            'user.companies',
+            'user.campaigns',
             [
                 'objectives' => CampaignsAPI::getCampaignObjectives(),
-                'adCompanies' => $adCompanies,
+                'adCampaigns' => $adCampaigns,
             ]
         );
     }
 
     /**
-     * Save Ad Company
+     * Create Ad Campaign
      *
      * @param Request $request
      *
      * @return JSON
      */
-    public function saveCompany(Request $request)
+    public function createCampaign(Request $request)
     {
         $this->validate(
             $request,
@@ -184,22 +185,20 @@ class UserController extends Controller
         DB::beginTransaction();
 
         try {
-            $user = Auth::user();
 
-            $adAccount = $user->advertisingAccount;
+            $fbAccount = $this->user->socialNetworkAccount;
 
-            if (!$adAccount) {
+            if (!$fbAccount) {
                 throw new \Exception('Error saving company');
             }
 
-            $company = [
+            $campaign = [
                 'name' => $request->input('name'),
                 'objective' => $request->input('objective')
             ];
 
-            $adApi = new AdvertisingApi($adAccount->account_id);
-            $adApi->addCompany($company);
-
+            $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
+            $adApi->addCampaign($campaign);
 
         } catch (\Exception $e) {
 
@@ -207,9 +206,9 @@ class UserController extends Controller
 
             return response()->json(
                 [
-                    'message' => 'Error saving FB advertising account',
+                    'message' => 'Error creating Ad Campaign',
                     'errors' => [
-                        'account_name' => 'Error saving FB advertising account',
+                        'name' => 'Error creating Ad Campaign',
                     ]
                 ],
                 422
@@ -220,7 +219,122 @@ class UserController extends Controller
 
         return response()->json(
             [
-                $company
+                $campaign
+            ]
+        );
+
+    }
+
+    /**
+     * User Ad Sets
+     *
+     * @return View
+     */
+    public function sets()
+    {
+        // Ad Account
+        $fbAccount = $this->user->socialNetworkAccount;
+
+        if (is_null($fbAccount)) {
+            return view(
+                'user.no-account'
+            );
+        }
+
+        $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adCampaigns = $adApi->getCampaigns();
+
+        return view(
+            'user.sets',
+            [
+                'optimizationGoals' => SetsAPI::getSetOptimizationGoals(),
+                'billingEvents' => SetsAPI::getSetBillingEvents(),
+                'adCampaigns' => $adCampaigns,
+            ]
+        );
+    }
+
+    /**
+     * Create Ad Set
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function createSet(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'name' => 'required|string',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date',
+                'bid_amount' => 'required|integer',
+                'daily_budget' => 'required|number',
+                'optimization_goal' => 'required|string',
+                'billing_event' => 'required|string',
+                'interest' => 'required|string',
+                'company' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'name' => 'Set Name',
+                    'start_date' => 'Start Date',
+                    'end_date' => 'End Date',
+                    'bid_amount' => 'BID Amount',
+                    'daily_budget' => 'Daily Budget',
+                    'optimization_goal' => 'Optimization Goal',
+                    'billing_event' => 'Billing Event',
+                    'interest' => 'Interest',
+                    'company' => 'Company',
+                ]
+            )
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$fbAccount) {
+                throw new \Exception('Error creating Ad Set');
+            }
+
+            $set = [
+                'name' => $request->input('name'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date'),
+                'bid_amount' => $request->input('bid_amount'),
+                'daily_budget' => $request->input('daily_budget'),
+                'optimization_goal' => $request->input('optimization_goal'),
+                'billing_event' => $request->input('billing_event'),
+                'interest' => $request->input('interest'),
+                'campaign' => $request->input('campaign'),
+            ];
+
+            $adApi = new SetsAPI($fbAccount->account_id, $fbAccount->account_token);
+            $adApi->addSet($set);
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            return response()->json(
+                [
+                    'message' => 'Error creating Ad Set',
+                    'errors' => [
+                        'account_name' => 'Error creating Ad Set',
+                    ]
+                ],
+                422
+            );
+        }
+
+        DB::commit();
+
+        return response()->json(
+            [
+                $set
             ]
         );
 

@@ -36,9 +36,30 @@ const showError = errorMessage => {
     Materialize.toast(errorMessage, 4000);
 }
 
+const showErrors = errorsList => {
+    $.each(
+        errorsList,
+        (field, error) => {
+            if (error.length) {
+                showError(error);
+            }
+        }
+    )
+}
+
 $(document).ready(function () {
     // Selects
     $('select').material_select();
+
+    // Datepicker
+    $('.datepicker').pickadate({
+        selectMonths: true,
+        selectYears: 15,
+        today: 'Today',
+        clear: 'Clear',
+        close: 'Ok',
+        closeOnSelect: true
+    });
 
     // Logout
     $('#logout-btn').on(
@@ -85,17 +106,7 @@ $(document).ready(function () {
                 )
                 .catch(
                     error => {
-
-                        const {errors} = error.response.data;
-
-                        $.each(
-                            errors,
-                            (field, error) => {
-                                if (error.length) {
-                                    showError(error);
-                                }
-                            }
-                        )
+                        showErrors(error.response.data.errors)
                     }
                 )
         }
@@ -113,7 +124,7 @@ $(document).ready(function () {
             };
 
             axios.post(
-                '/user/company',
+                '/user/campaign',
                 qs.stringify(credentials)
             )
                 .then(
@@ -133,17 +144,52 @@ $(document).ready(function () {
                 )
                 .catch(
                     error => {
+                        showErrors(error.response.data.errors)
+                    }
+                )
+        }
+    );
 
-                        const {errors} = error.response.data;
+    // Ad Set
+    $('#set_form').on(
+        'submit',
+        function (event) {
+            event.preventDefault();
 
-                        $.each(
-                            errors,
-                            (field, error) => {
-                                if (error.length) {
-                                    showError(error);
-                                }
-                            }
-                        )
+            const credentials = {
+                name: $(this).find('input[name="name"]').val().trim(),
+                start_date: $(this).find('input[name="start_date"]').val().trim(),
+                end_date: $(this).find('input[name="end_date"]').val().trim(),
+                bid_amount: $(this).find('input[name="bid_amount"]').val().trim(),
+                daily_budget: $(this).find('input[name="daily_budget"]').val().trim(),
+                optimization_goal: $(this).find('select[name="optimization_goal"]').val(),
+                billing_event: $(this).find('select[name="billing_event"]').val(),
+                interest: $(this).find('input[name="interest"]').val().trim(),
+                campaign: $(this).find('select[name="campaign"]').val(),
+            };
+
+            axios.post(
+                '/user/set',
+                qs.stringify(credentials)
+            )
+                .then(
+                    response => {
+                        showMessage('Set successfully created.');
+
+                        // $('ad_companies tbody').prepend(
+                        //     $('<tr />')
+                        //         .append(
+                        //             $('<td />').html(response.data.name)
+                        //         )
+                        //         .append(
+                        //             $('<td />').html(response.data.objective)
+                        //         )
+                        // )
+                    }
+                )
+                .catch(
+                    error => {
+                        showErrors(error.response.data.errors)
                     }
                 )
         }
