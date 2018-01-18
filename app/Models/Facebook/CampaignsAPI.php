@@ -18,7 +18,7 @@ class CampaignsAPI extends AdvertisingApi
     {
         $account = new AdAccount($this->accountID);
 
-        $campaigns = $account->getCampaigns(
+        $adCampaigns = $account->getCampaigns(
             [
                 CampaignFields::ID,
                 CampaignFields::NAME,
@@ -27,7 +27,7 @@ class CampaignsAPI extends AdvertisingApi
             ]
         );
 
-        return $campaigns;
+        return $adCampaigns;
     }
 
     /**

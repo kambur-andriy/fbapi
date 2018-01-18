@@ -94,8 +94,8 @@
                     <i class="material-icons prefix">chat_bubble_outline</i>
 
                     <select name="campaign">
-                        @foreach($adCampaigns as $adCampaign)
-                            <option value="{{ $adCampaign->id }}">{{ $adCampaign->name }}</option>
+                        @foreach($adCampaigns as $adCampaignID => $adCampaign)
+                            <option value="{{ $adCampaignID }}">{{ $adCampaign }}</option>
                         @endforeach
                     </select>
 
@@ -117,16 +117,18 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Objective</th>
+                <th>Daily Budget</th>
+                <th>Campaign</th>
                 <th>Status</th>
             </tr>
             </thead>
             <tbody>
-            @foreach($adCampaigns as $adCampaign)
-                <tr id="{{ $adCampaign->id }}">
-                    <td> {{ $adCampaign->name }} </td>
-                    <td> {{ $adCampaign->objective }} </td>
-                    <td> {{ $adCampaign->status }} </td>
+            @foreach($adSets as $adSet)
+                <tr id="{{ $adSet->id }}">
+                    <td> {{ $adSet->name }} </td>
+                    <td> {{ $adSet->daily_budget }} </td>
+                    <td> {{ $adCampaigns[$adSet->campaign['id']] }} </td>
+                    <td> {{ $adSet->status }} </td>
                 </tr>
             @endforeach
             </tbody>

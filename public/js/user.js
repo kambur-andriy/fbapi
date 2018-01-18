@@ -29950,6 +29950,7 @@ $(document).ready(function () {
 
     // Datepicker
     $('.datepicker').pickadate({
+        format: 'mm/dd/yyyy',
         selectMonths: true,
         selectYears: 15,
         today: 'Today',
@@ -30009,8 +30010,8 @@ $(document).ready(function () {
 
         var credentials = {
             name: $(this).find('input[name="name"]').val().trim(),
-            start_date: $(this).find('input[name="start_date"]').val().trim(),
-            end_date: $(this).find('input[name="end_date"]').val().trim(),
+            start_date: $(this).find('input[name="start_date"]').val(),
+            end_date: $(this).find('input[name="end_date"]').val(),
             bid_amount: $(this).find('input[name="bid_amount"]').val().trim(),
             daily_budget: $(this).find('input[name="daily_budget"]').val().trim(),
             optimization_goal: $(this).find('select[name="optimization_goal"]').val(),

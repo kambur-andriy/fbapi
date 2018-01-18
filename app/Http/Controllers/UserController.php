@@ -242,7 +242,14 @@ class UserController extends Controller
         }
 
         $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
-        $adCampaigns = $adApi->getCampaigns();
+        $adCampaigns = [];
+
+        foreach ($adApi->getCampaigns() as $adCampaign) {
+            $adCampaigns[$adCampaign->id] = $adCampaign->name;
+        }
+
+        $adApi = new SetsAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adSets = $adApi->getSets();
 
         return view(
             'user.sets',
@@ -250,6 +257,7 @@ class UserController extends Controller
                 'optimizationGoals' => SetsAPI::getSetOptimizationGoals(),
                 'billingEvents' => SetsAPI::getSetBillingEvents(),
                 'adCampaigns' => $adCampaigns,
+                'adSets' => $adSets,
             ]
         );
     }
@@ -270,11 +278,11 @@ class UserController extends Controller
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
                 'bid_amount' => 'required|integer',
-                'daily_budget' => 'required|number',
+                'daily_budget' => 'required|integer',
                 'optimization_goal' => 'required|string',
                 'billing_event' => 'required|string',
                 'interest' => 'required|string',
-                'company' => 'required|string',
+                'campaign' => 'required|string',
             ],
             ValidationMessages::getList(
                 [
@@ -286,7 +294,7 @@ class UserController extends Controller
                     'optimization_goal' => 'Optimization Goal',
                     'billing_event' => 'Billing Event',
                     'interest' => 'Interest',
-                    'company' => 'Company',
+                    'campaign' => 'Campaign',
                 ]
             )
         );
@@ -321,7 +329,7 @@ class UserController extends Controller
 
             return response()->json(
                 [
-                    'message' => 'Error creating Ad Set',
+                    'message' => $e->getErrorUserMessage(),//'Error creating Ad Set',
                     'errors' => [
                         'account_name' => 'Error creating Ad Set',
                     ]

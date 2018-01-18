@@ -10,6 +10,8 @@ use FacebookAds\Object\TargetingSearch;
 use FacebookAds\Object\Search\TargetingSearchTypes;
 use FacebookAds\Object\Targeting;
 use FacebookAds\Object\Fields\TargetingFields;
+use FacebookAds\Object\AdAccount;
+use DateTime;
 
 
 class SetsAPI extends AdvertisingApi
@@ -17,10 +19,23 @@ class SetsAPI extends AdvertisingApi
     /**
      * Get Ad Sets for Account
      *
-     * return
+     * return FacebookAds\Cursor
      */
     public function getSets()
     {
+        $account = new AdAccount($this->accountID);
+
+        $adSets = $account->getAdSets(
+            [
+                AdSetFields::ID,
+                AdSetFields::NAME,
+                AdSetFields::DAILY_BUDGET,
+                AdSetFields::CAMPAIGN,
+                AdSetFields::STATUS
+            ]
+        );
+
+        return $adSets;
     }
 
     /**
@@ -37,18 +52,25 @@ class SetsAPI extends AdvertisingApi
 
         $adSet = new AdSet(null, $this->accountID);
 
-        $adSet->setData(array(
-            AdSetFields::NAME => $set['name'],
-            AdSetFields::OPTIMIZATION_GOAL => $set['optimization_goal'],
-            AdSetFields::BILLING_EVENT => $set['billing_event'],
-            AdSetFields::BID_AMOUNT => $set['bid_amount'],
-            AdSetFields::DAILY_BUDGET => $set['daily_budget'],
-            AdSetFields::CAMPAIGN_ID => $set['campaign'],
-            AdSetFields::START_TIME => $set['start_date'],
-            AdSetFields::END_TIME => $set['end_date'],
-            AdSetFields::TARGETING => $targeting,
-        ));
+        $adSet->setData(
+            [
+                AdSetFields::NAME => $set['name'],
+                AdSetFields::OPTIMIZATION_GOAL => $set['optimization_goal'],
+                AdSetFields::BILLING_EVENT => $set['billing_event'],
+                AdSetFields::BID_AMOUNT => $set['bid_amount'],
+                AdSetFields::DAILY_BUDGET => $set['daily_budget'],
+                AdSetFields::CAMPAIGN_ID => $set['campaign'],
+                AdSetFields::START_TIME => (new \DateTime($set['start_date']))->format(DateTime::ISO8601),
+                AdSetFields::END_TIME => (new \DateTime($set['end_date']))->format(DateTime::ISO8601),
+                AdSetFields::TARGETING => $targeting,
+            ]
+        );
 
+        $adSet->create(
+            [
+                AdSet::STATUS_PARAM_NAME => AdSet::STATUS_PAUSED,
+            ]
+        );
     }
 
 
@@ -78,11 +100,12 @@ class SetsAPI extends AdvertisingApi
     {
         $targeting = new Targeting();
 
-        $targeting->{TargetingFields::GEO_LOCATIONS} = [
-            'countries' => ['US']
-        ];
-
         $targeting->{TargetingFields::INTERESTS} = $targetInterest;
+
+        $targeting->{TargetingFields::GEO_LOCATIONS} =
+            [
+                'countries' => ['US']
+            ];
 
         return $targeting;
     }
