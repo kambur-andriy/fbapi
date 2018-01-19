@@ -32,7 +32,7 @@ class SocialNetworkAccount extends Model
      * Get user
      */
     public function user() {
-        return $this->belongsTo('App\Models\DB\User', 'id', 'user_id');
+        return $this->belongsTo('App\Models\DB\User', 'user_id', 'id');
     }
 
 }

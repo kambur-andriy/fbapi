@@ -46,7 +46,7 @@
 
     <div class="section">
 
-        <table id="ad_companies" class="highlight">
+        <table id="ad_campaigns" class="highlight">
             <thead>
             <tr>
                 <th>Name</th>

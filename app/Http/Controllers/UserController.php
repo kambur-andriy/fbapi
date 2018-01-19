@@ -18,6 +18,7 @@ use App\Models\Facebook\AdvertisingApi;
 use App\Models\Facebook\CampaignsAPI;
 use App\Models\Facebook\SetsAPI;
 use App\Models\Validation\ValidationMessages;
+use FacebookAds\Http\Exception\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -192,23 +193,25 @@ class UserController extends Controller
                 throw new \Exception('Error saving company');
             }
 
-            $campaign = [
+            $campaignInfo = [
                 'name' => $request->input('name'),
                 'objective' => $request->input('objective')
             ];
 
             $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
-            $adApi->addCampaign($campaign);
+            $adCampaign = $adApi->addCampaign($campaignInfo);
 
         } catch (\Exception $e) {
 
             DB::rollback();
 
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Campaign';
+
             return response()->json(
                 [
-                    'message' => 'Error creating Ad Campaign',
+                    'message' => $message,
                     'errors' => [
-                        'name' => 'Error creating Ad Campaign',
+                        'name' => $message,
                     ]
                 ],
                 422
@@ -218,9 +221,7 @@ class UserController extends Controller
         DB::commit();
 
         return response()->json(
-            [
-                $campaign
-            ]
+            $adCampaign
         );
 
     }
@@ -308,7 +309,7 @@ class UserController extends Controller
                 throw new \Exception('Error creating Ad Set');
             }
 
-            $set = [
+            $setInfo = [
                 'name' => $request->input('name'),
                 'start_date' => $request->input('start_date'),
                 'end_date' => $request->input('end_date'),
@@ -321,17 +322,19 @@ class UserController extends Controller
             ];
 
             $adApi = new SetsAPI($fbAccount->account_id, $fbAccount->account_token);
-            $adApi->addSet($set);
+            $adSet = $adApi->addSet($setInfo);
 
         } catch (\Exception $e) {
 
             DB::rollback();
 
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Set';
+
             return response()->json(
                 [
-                    'message' => $e->getErrorUserMessage(),//'Error creating Ad Set',
+                    'message' => $message,
                     'errors' => [
-                        'account_name' => 'Error creating Ad Set',
+                        'name' => $message,
                     ]
                 ],
                 422
@@ -341,9 +344,7 @@ class UserController extends Controller
         DB::commit();
 
         return response()->json(
-            [
-                $set
-            ]
+            $adSet
         );
 
     }

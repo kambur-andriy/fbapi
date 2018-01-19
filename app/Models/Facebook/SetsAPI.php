@@ -40,9 +40,11 @@ class SetsAPI extends AdvertisingApi
 
     /**
      * Add new Ad Set
-     *
-     * @param array $set
-     *
+     * 
+     * @param $set
+     * 
+     * @return AdSet
+     * 
      * @throws \Exception
      */
     public function addSet($set)
@@ -71,6 +73,8 @@ class SetsAPI extends AdvertisingApi
                 AdSet::STATUS_PARAM_NAME => AdSet::STATUS_PAUSED,
             ]
         );
+
+        return $adSet;
     }
 
 

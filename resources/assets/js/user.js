@@ -33,7 +33,7 @@ const showMessage = message => {
 
 // Errors
 const showError = errorMessage => {
-    Materialize.toast(errorMessage, 4000);
+    Materialize.toast(errorMessage, 10000);
 }
 
 const showErrors = errorsList => {
@@ -132,15 +132,18 @@ $(document).ready(function () {
             )
                 .then(
                     response => {
-                        showMessage('Company successfully saved.');
+                        showMessage('Campaign successfully saved.');
 
-                        $('ad_companies tbody').prepend(
+                        $('ad_campaigns tbody').prepend(
                             $('<tr />')
                                 .append(
                                     $('<td />').html(response.data.name)
                                 )
                                 .append(
                                     $('<td />').html(response.data.objective)
+                                )
+                                .append(
+                                    $('<td />').html(response.data.status)
                                 )
                         )
                     }
@@ -179,15 +182,21 @@ $(document).ready(function () {
                     response => {
                         showMessage('Set successfully created.');
 
-                        // $('ad_companies tbody').prepend(
-                        //     $('<tr />')
-                        //         .append(
-                        //             $('<td />').html(response.data.name)
-                        //         )
-                        //         .append(
-                        //             $('<td />').html(response.data.objective)
-                        //         )
-                        // )
+                        $('ad_sets tbody').prepend(
+                            $('<tr />')
+                                .append(
+                                    $('<td />').html(response.data.name)
+                                )
+                                .append(
+                                    $('<td />').html(response.data.daily_budget)
+                                )
+                                .append(
+                                    $('<td />').html('')
+                                )
+                                .append(
+                                    $('<td />').html(response.data.status)
+                                )
+                        )
                     }
                 )
                 .catch(

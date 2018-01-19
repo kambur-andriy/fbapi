@@ -50,7 +50,7 @@ class Account
             $fbAccount->account_token = $fbUserInfo->token;
             $fbAccount->save();
 
-            $userID = $fbAccount->user()->id;
+            $userID = $fbAccount->user->id;
         }
 
         return $userID;

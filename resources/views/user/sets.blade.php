@@ -11,86 +11,10 @@
 
     <div class="section">
 
-        <form id="set_form" class="col s12 m12 l8 xl-8 offset-m2 offset-xl2">
-
+        <form id="set_form" class="col s12 m12 l12 xl12">
             <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chat_bubble</i>
-                    <input name="name" type="text" class="validate">
-                    <label for="name">Name</label>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-                    <input name="start_date" type="text" class="datepicker">
-                    <label for="start_date">Start Date</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-                    <input name="end_date" type="text" class="datepicker">
-                    <label for="end_date">End Date</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-                    <input name="bid_amount" type="text" class="validate">
-                    <label for="bid_amount">BID Amount</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-                    <input name="daily_budget" type="text" class="validate">
-                    <label for="daily_budget">Daily Budget</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-
-                    <select name="optimization_goal">
-                        @foreach($optimizationGoals as $optimizationGoalID => $optimizationGoal)
-                            <option value="{{ $optimizationGoalID }}">{{ $optimizationGoal }}</option>
-                        @endforeach
-                    </select>
-
-                    <label for="optimization_goal">Optimization Goal</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-
-                    <select name="billing_event">
-                        @foreach($billingEvents as $billingEventID => $billingEvent)
-                            <option value="{{ $billingEventID }}">{{ $billingEvent }}</option>
-                        @endforeach
-                    </select>
-
-                    <label for="billing_event">Billing Event</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">chevron_right</i>
-                    <input name="interest" type="text" class="validate">
-                    <label for="name">Interest</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-field col s12">
+                <div class="input-field col s12 m12 l12 xl12">
                     <i class="material-icons prefix">chat_bubble_outline</i>
 
                     <select name="campaign">
@@ -101,6 +25,96 @@
 
                     <label for="billing_event">Campaign</label>
                 </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col s12 m12 l6 xl6">
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chat_bubble</i>
+                            <input name="name" type="text" class="validate">
+                            <label for="name">Name</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+                            <input name="start_date" type="text" class="datepicker">
+                            <label for="start_date">Start Date</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+                            <input name="end_date" type="text" class="datepicker">
+                            <label for="end_date">End Date</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+                            <input name="bid_amount" type="text" class="validate">
+                            <label for="bid_amount">BID Amount</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+                            <input name="daily_budget" type="text" class="validate">
+                            <label for="daily_budget">Daily Budget</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+
+                            <select name="optimization_goal">
+                                @foreach($optimizationGoals as $optimizationGoalID => $optimizationGoal)
+                                    <option value="{{ $optimizationGoalID }}">{{ $optimizationGoal }}</option>
+                                @endforeach
+                            </select>
+
+                            <label for="optimization_goal">Optimization Goal</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+
+                            <select name="billing_event">
+                                @foreach($billingEvents as $billingEventID => $billingEvent)
+                                    <option value="{{ $billingEventID }}">{{ $billingEvent }}</option>
+                                @endforeach
+                            </select>
+
+                            <label for="billing_event">Billing Event</label>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="col s12 m12 l6 xl6">
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">gps_fixed</i>
+                            <input name="interest" type="text" class="validate">
+                            <label for="name">Targeting Interest</label>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
             <button class="btn waves-effect waves-light right grey" type="submit" name="action">

@@ -31,28 +31,31 @@ class CampaignsAPI extends AdvertisingApi
     }
 
     /**
-     * Add new Ad Company
+     * Add new Ad Campaign
      *
-     * @param array $company
+     * @param array $campaign
      *
+     * @return Campaign
      * @throws \Exception
      */
-    public function addCampaign($company)
+    public function addCampaign($campaign)
     {
-        $campaign = new Campaign(null, $this->accountID);
+        $adCampaign = new Campaign(null, $this->accountID);
 
-        $campaign->setData(
+        $adCampaign->setData(
             [
-                CampaignFields::NAME => $company['name'],
-                CampaignFields::OBJECTIVE => $company['objective'],
+                CampaignFields::NAME => $campaign['name'],
+                CampaignFields::OBJECTIVE => $campaign['objective'],
             ]
         );
 
-        $campaign->create(
+        $adCampaign->create(
             [
                 Campaign::STATUS_PARAM_NAME => Campaign::STATUS_PAUSED,
             ]
         );
+
+        return $adCampaign;
     }
 
     /**
