@@ -26,8 +26,7 @@ class AdvertisingApi
      */
     public function __construct($accountID, $accountAccessToken)
     {
-//        $this->accountID = 'act_' . $accountID;
-        $this->accountID = 'act_119514882183553';
+        $this->accountID = 'act_' . $accountID;
 
 //        $this->accountAccessToken = $accountAccessToken;
         $this->accountAccessToken = 'EAAHw6rFh6WIBALd70GfXwz6ZBQc8srnWFR79rlZCl2YYHeEemyEsXJ2nYPlrQNyeT8ZBOg0aGgigLsRFWqwKhKOrakei1LCtBGK7xlFc0hz7TYihhgaprchziuuT8k8ioJC5oICqZAsWBJ7L9wvsAZBjvMD3jPASEYdY4Ij6ad7YdY43w1cvRZCcQTcDhGzeF7YFvP4y2pu6UP3SKNGCCoZAERQvXZCz3e0ZD';

@@ -4,6 +4,7 @@
  * Main Page
  */
 Route::get('/', 'IndexController@main');
+Route::get('creative', 'IndexController@creative');
 Route::post('contact-us', 'IndexController@contactUs');
 //Route::get('reset-password', 'IndexController@resetPassword');
 
@@ -33,9 +34,13 @@ Route::group(['prefix' => 'user'], function () {
 
     Route::get('campaigns', 'UserController@campaigns');
     Route::post('campaign', 'UserController@createCampaign');
+    Route::post('campaign/delete', 'UserController@deleteCampaign');
 
     Route::get('sets', 'UserController@sets');
     Route::post('set', 'UserController@createSet');
+
+    Route::get('creatives', 'UserController@creatives');
+    Route::post('creative', 'UserController@createCreative');
 
 });
 

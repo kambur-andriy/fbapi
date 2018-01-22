@@ -4,7 +4,8 @@
     <li><a href="profile">Profile</a></li>
     <li><a href="campaigns">Campaigns</a></li>
     <li class="active"><a href="sets">Sets</a></li>
-    <li><a href="advertising">Advertising</a></li>
+    <li><a href="creatives">Creatives</a></li>
+    <li><a href="ads">Ads</a></li>
 @endsection
 
 @section('content')

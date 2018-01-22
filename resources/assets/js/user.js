@@ -1,7 +1,9 @@
 require('./bootstrap');
 
 // Message
-const showMessage = message => {
+const showMessage = (message, complete = () => {
+    window.location.reload()
+}) => {
     const modal = $('<div />')
         .attr('id', 'custom-message')
         .addClass('modal')
@@ -14,8 +16,7 @@ const showMessage = message => {
             $('<div />').addClass('modal-footer')
                 .append(
                     $('<a />')
-                        .attr('href', '')
-                        .addClass('modal-action modal-close waves-effect waves-green btn-flat')
+                        .addClass('modal-action modal-close btn waves-effect waves-light grey')
                         .html('Close')
                 )
         );
@@ -24,7 +25,8 @@ const showMessage = message => {
 
     $('#custom-message').modal(
         {
-            dismissible: true
+            dismissible: true,
+            complete: complete
         }
     );
 
@@ -46,6 +48,39 @@ const showErrors = errorsList => {
         }
     )
 }
+
+// Process request
+const getSpinner = () => {
+    return $('<i />')
+        .addClass('material-icons right spinner')
+        .html('cached')
+}
+
+const startRequest = (button, withSpinner = true) => {
+    if (button.hasClass('btn-floating')) {
+        button.find('.material-icons').hide();
+    }
+
+    button.prop('disabled', true);
+
+    if (withSpinner === true) {
+        button.append(
+            getSpinner()
+        );
+    }
+}
+
+const stopRequest = button => {
+    if (button.hasClass('btn-floating')) {
+        button.find('.material-icons:hidden').show();
+    }
+
+    button.prop('disabled', false);
+
+    $('.spinner').remove();
+}
+
+
 
 $(document).ready(function () {
     // Selects
@@ -93,7 +128,12 @@ $(document).ready(function () {
         function (event) {
             event.preventDefault();
 
+            const button = $(this).find('.btn');
+
+            startRequest(button, false);
+
             const credentials = {
+                ad_account_id: $(this).find('input[name="ad_account_id"]').val(),
                 first_name: $(this).find('input[name="first_name"]').val(),
                 last_name: $(this).find('input[name="last_name"]').val(),
             };
@@ -104,26 +144,35 @@ $(document).ready(function () {
             )
                 .then(
                     () => {
+                        stopRequest(button);
+
                         showMessage('Profile successfully saved');
                     }
                 )
                 .catch(
                     error => {
+                        stopRequest(button);
+
                         showErrors(error.response.data.errors)
                     }
                 )
         }
     );
 
-    // Ad Company
-    $('#company_form').on(
+    // Create Ad Company
+    $('#campaign_form').on(
         'submit',
         function (event) {
             event.preventDefault();
 
+            const button = $(this).find('.btn');
+
+            startRequest(button);
+
             const credentials = {
                 name: $(this).find('input[name="name"]').val().trim(),
-                objective: $(this).find('select[name="objective"]').val()
+                objective: $(this).find('select[name="objective"]').val(),
+                status: $(this).find('select[name="status"]').val()
             };
 
             axios.post(
@@ -131,25 +180,51 @@ $(document).ready(function () {
                 qs.stringify(credentials)
             )
                 .then(
-                    response => {
-                        showMessage('Campaign successfully saved.');
+                    () => {
+                        stopRequest(button);
 
-                        $('ad_campaigns tbody').prepend(
-                            $('<tr />')
-                                .append(
-                                    $('<td />').html(response.data.name)
-                                )
-                                .append(
-                                    $('<td />').html(response.data.objective)
-                                )
-                                .append(
-                                    $('<td />').html(response.data.status)
-                                )
-                        )
+                        showMessage('Campaign successfully saved.');
                     }
                 )
                 .catch(
                     error => {
+                        stopRequest(button);
+
+                        showErrors(error.response.data.errors)
+                    }
+                )
+        }
+    );
+
+    // Delete Ad Company
+    $('.delete-campaign').on(
+        'click',
+        function (event) {
+            event.preventDefault();
+
+            const button = $(this);
+
+            startRequest(button);
+
+            const credentials = {
+                campaign: $(this).parents('tr').attr('id'),
+            };
+
+            axios.post(
+                '/user/campaign/delete',
+                qs.stringify(credentials)
+            )
+                .then(
+                    () => {
+                        stopRequest(button);
+
+                        showMessage('Campaign successfully deleted.');
+                    }
+                )
+                .catch(
+                    error => {
+                        stopRequest(button);
+
                         showErrors(error.response.data.errors)
                     }
                 )
@@ -197,6 +272,37 @@ $(document).ready(function () {
                                     $('<td />').html(response.data.status)
                                 )
                         )
+                    }
+                )
+                .catch(
+                    error => {
+                        showErrors(error.response.data.errors)
+                    }
+                )
+        }
+    );
+
+    // Ad Creative
+    $('#creative_form').on(
+        'submit',
+        function (event) {
+            event.preventDefault();
+
+            const credentials = new FormData();
+
+            credentials.append('name', $(this).find('input[name="name"]').val().trim());
+            credentials.append('page', $(this).find('input[name="page"]').val().trim());
+            credentials.append('link', $(this).find('input[name="link"]').val().trim());
+            credentials.append('message', $(this).find('input[name="message"]').val().trim());
+            credentials.append('image_file', $('input[name="image_file"]')[0].files[0]);
+
+            axios.post(
+                '/user/creative',
+                credentials
+            )
+                .then(
+                    () => {
+                        showMessage('Creative successfully created.');
                     }
                 )
                 .catch(

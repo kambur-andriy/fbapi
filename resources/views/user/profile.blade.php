@@ -4,7 +4,8 @@
     <li class="active"><a href="profile">Profile</a></li>
     <li><a href="campaigns">Campaigns</a></li>
     <li><a href="sets">Sets</a></li>
-    <li><a href="advertising">Advertising</a></li>
+    <li><a href="creatives">Creatives</a></li>
+    <li><a href="ads">Ads</a></li>
 @endsection
 
 @section('content')
@@ -16,8 +17,8 @@
             <div class="row">
                 <div class="input-field col s12">
                     <i class="material-icons prefix">label_outline</i>
-                    <input name="account_id" type="text" value="{{ $adAccount->account_id }}" readonly>
-                    <label for="account_id">Account ID</label>
+                    <input name="ad_account_id" type="text" value="{{ $profile->ad_account_id }}">
+                    <label for="account_id">Ad Account ID</label>
                 </div>
             </div>
 

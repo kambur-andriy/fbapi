@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 
 class IndexController extends Controller
@@ -132,6 +133,34 @@ class IndexController extends Controller
 
         return response()->json(
             []
+        );
+    }
+
+    /**
+     * Show user document
+     *
+     * @param Request $request
+     *
+     * @return View
+     */
+    public function creative(Request $request)
+    {
+        $this->validate($request, [
+            'cin' => 'required|string',
+        ]);
+
+        $fileName = $request->input('cin', '');
+
+        $filePath = 'creatives/' . $fileName;
+
+        if (!Storage::exists($filePath)) {
+            return redirect('/');
+        }
+        $mimeType = Storage::mimeType($filePath);
+
+        return response()->file(
+            storage_path('app/' . $filePath),
+            ['Content-Type' => $mimeType]
         );
     }
 

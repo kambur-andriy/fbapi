@@ -16,6 +16,7 @@ use App\Models\DB\User;
 use App\Models\DB\Verification;
 use App\Models\Facebook\AdvertisingApi;
 use App\Models\Facebook\CampaignsAPI;
+use App\Models\Facebook\CreativesAPI;
 use App\Models\Facebook\SetsAPI;
 use App\Models\Validation\ValidationMessages;
 use FacebookAds\Http\Exception\AuthorizationException;
@@ -36,6 +37,11 @@ class UserController extends Controller
     protected $user;
 
     /**
+     * Ad Account ID
+     */
+    protected $adAccountID;
+
+    /**
      * UserController constructor.
      */
     public function __construct()
@@ -45,6 +51,8 @@ class UserController extends Controller
         $this->middleware(
             function ($request, $next) {
                 $this->user = Auth::user();
+
+                $this->adAccountID = $this->user->profile->ad_account_id;
 
                 return $next($request);
             }
@@ -61,14 +69,10 @@ class UserController extends Controller
         // Profile
         $profile = $this->user->profile;
 
-        // FB Account
-        $fbAccount = $this->user->socialNetworkAccount;
-
         return view(
             'user.profile',
             [
-                'profile' => $profile,
-                'adAccount' => $fbAccount
+                'profile' => $profile
             ]
         );
     }
@@ -85,11 +89,13 @@ class UserController extends Controller
         $this->validate(
             $request,
             [
+                'ad_account_id' => 'required|string',
                 'first_name' => 'alpha|max:100|nullable',
                 'last_name' => 'alpha|max:100|nullable',
             ],
             ValidationMessages::getList(
                 [
+                    'ad_account_id' => 'Ad Account ID',
                     'first_name' => 'First Name',
                     'last_name' => 'Last Name',
                 ]
@@ -105,6 +111,7 @@ class UserController extends Controller
                 throw new \Exception('Error updating profile');
             }
 
+            $profile->ad_account_id = $request->ad_account_id;
             $profile->first_name = $request->first_name;
             $profile->last_name = $request->last_name;
             $profile->save();
@@ -139,23 +146,23 @@ class UserController extends Controller
      */
     public function campaigns()
     {
-        // Ad Account
         $fbAccount = $this->user->socialNetworkAccount;
 
-        if (is_null($fbAccount)) {
+        if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
             return view(
                 'user.no-account'
             );
         }
 
-        $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adApi = new CampaignsAPI($this->adAccountID, $fbAccount->account_token);
         $adCampaigns = $adApi->getCampaigns();
 
         return view(
             'user.campaigns',
             [
-                'objectives' => CampaignsAPI::getCampaignObjectives(),
                 'adCampaigns' => $adCampaigns,
+                'objectives' => CampaignsAPI::getCampaignObjectives(),
+                'statuses' => CampaignsAPI::getCampaignStatuses(),
             ]
         );
     }
@@ -174,11 +181,72 @@ class UserController extends Controller
             [
                 'name' => 'required|string',
                 'objective' => 'required|string',
+                'status' => 'required|string',
             ],
             ValidationMessages::getList(
                 [
-                    'name' => 'Company Name',
-                    'objective' => 'Company Objective',
+                    'name' => 'Campaign Name',
+                    'objective' => 'Campaign Objective',
+                    'status' => 'Campaign Status',
+                ]
+            )
+        );
+
+        try {
+
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error saving campaign');
+            }
+
+            $campaignInfo = [
+                'name' => $request->input('name'),
+                'objective' => $request->input('objective'),
+                'status' => $request->input('status')
+            ];
+
+            $adApi = new CampaignsAPI($this->adAccountID, $fbAccount->account_token);
+            $adApi->addCampaign($campaignInfo);
+
+        } catch (\Exception $e) {
+
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Campaign';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => [
+                        'name' => $message,
+                    ]
+                ],
+                422
+            );
+        }
+
+        return response()->json(
+            []
+        );
+
+    }
+
+    /**
+     * Delete Ad Campaign
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function deleteCampaign(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'campaign' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'campaign' => 'Campaign',
                 ]
             )
         );
@@ -189,23 +257,20 @@ class UserController extends Controller
 
             $fbAccount = $this->user->socialNetworkAccount;
 
-            if (!$fbAccount) {
-                throw new \Exception('Error saving company');
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error deleting campaign');
             }
 
-            $campaignInfo = [
-                'name' => $request->input('name'),
-                'objective' => $request->input('objective')
-            ];
+            $adCampaign = $request->input('campaign');
 
             $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
-            $adCampaign = $adApi->addCampaign($campaignInfo);
+            $adApi->deleteCampaign($adCampaign);
 
         } catch (\Exception $e) {
 
             DB::rollback();
 
-            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Campaign';
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad Campaign';
 
             return response()->json(
                 [
@@ -221,10 +286,11 @@ class UserController extends Controller
         DB::commit();
 
         return response()->json(
-            $adCampaign
+            []
         );
 
     }
+
 
     /**
      * User Ad Sets
@@ -349,4 +415,127 @@ class UserController extends Controller
 
     }
 
+    /**
+     * User Ad Creatives
+     *
+     * @return View
+     */
+    public function creatives()
+    {
+        // Ad Account
+        $fbAccount = $this->user->socialNetworkAccount;
+
+        if (is_null($fbAccount)) {
+            return view(
+                'user.no-account'
+            );
+        }
+
+        $adApi = new CreativesAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adCreatives = $adApi->getCreatives();
+
+        return view(
+            'user.creatives',
+            [
+                'creatives' => $adCreatives
+            ]
+        );
+    }
+
+    /**
+     * Create Ad Creative
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function createCreative(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'name' => 'required|string',
+                'page' => 'required|string',
+                'link' => 'required|url',
+                'message' => 'required|string',
+                'image_file' => 'file|max:2048|mimetypes:image/jpeg,image/png',
+            ],
+            ValidationMessages::getList(
+                [
+                    'name' => 'Name',
+                    'page' => 'Page ID',
+                    'link' => 'Link',
+                    'message' => 'Message',
+                    'image_file' => 'Image File',
+                ]
+            )
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$fbAccount) {
+                throw new \Exception('Error creating Ad Set');
+            }
+
+            $file = $request->file('image_file');
+
+            $newFileName = $fbAccount->account_id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+            $file->storeAs('creatives', $newFileName);
+
+            $creativeInfo = [
+                'name' => $request->input('name'),
+                'page' => $request->input('page'),
+                'link' => $request->input('link'),
+                'message' => $request->input('message'),
+                'image_path' => action('IndexController@creative', ['cin' => $newFileName]),
+            ];
+
+            $adApi = new CreativesAPI($fbAccount->account_id, $fbAccount->account_token);
+            $adApi->addCreative($creativeInfo);
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+//            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Creative';
+            $message = 'Error creating Ad Creative';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => [
+                        'name' => $message,
+                    ]
+                ],
+                422
+            );
+        }
+
+        DB::commit();
+
+        return response()->json(
+            []
+        );
+
+    }
+
+    /**
+     * Check if FB Account exist and Ad Account ID is not empty
+     *
+     * @param string $adAccountID
+     * @param SocialNetworkAccount $fbAccount
+     *
+     * @return bool
+     */
+    protected function canUseAPI($adAccountID, $fbAccount) {
+        if (is_null($fbAccount) || is_null($this->adAccountID)) {
+            return false;
+        }
+
+        return true;
+    }
 }

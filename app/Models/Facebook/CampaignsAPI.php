@@ -6,6 +6,7 @@ use FacebookAds\Object\AdAccount;
 use FacebookAds\Object\Campaign;
 use FacebookAds\Object\Fields\CampaignFields;
 use FacebookAds\Object\Values\CampaignObjectiveValues;
+use FacebookAds\Object\Values\ArchivableCrudObjectEffectiveStatuses;
 
 class CampaignsAPI extends AdvertisingApi
 {
@@ -24,6 +25,13 @@ class CampaignsAPI extends AdvertisingApi
                 CampaignFields::NAME,
                 CampaignFields::OBJECTIVE,
                 CampaignFields::STATUS,
+            ],
+            [
+                CampaignFields::EFFECTIVE_STATUS =>
+                    [
+                        ArchivableCrudObjectEffectiveStatuses::ACTIVE,
+                        ArchivableCrudObjectEffectiveStatuses::PAUSED,
+                    ]
             ]
         );
 
@@ -51,7 +59,7 @@ class CampaignsAPI extends AdvertisingApi
 
         $adCampaign->create(
             [
-                Campaign::STATUS_PARAM_NAME => Campaign::STATUS_PAUSED,
+                Campaign::STATUS_PARAM_NAME => $campaign['status'],
             ]
         );
 
@@ -59,7 +67,21 @@ class CampaignsAPI extends AdvertisingApi
     }
 
     /**
-     * Get available company objecives
+     * Delete Ad Campaign
+     *
+     * @param string $campaign
+     *
+     * @throws \Exception
+     */
+    public function deleteCampaign($campaign)
+    {
+        $campaign = new Campaign($campaign);
+
+        $campaign->deleteSelf();
+    }
+
+    /**
+     * Get available campaign objecives
      *
      * @return array
      */
@@ -82,4 +104,20 @@ class CampaignsAPI extends AdvertisingApi
 
         ];
     }
+
+    /**
+     * Get available campaign statuses
+     *
+     * @return array
+     */
+    public static function getCampaignStatuses()
+    {
+        return [
+            Campaign::STATUS_ACTIVE => 'ACTIVE',
+            Campaign::STATUS_PAUSED => 'PAUSED',
+            Campaign::STATUS_DELETED => 'DELETED',
+            Campaign::STATUS_ARCHIVED => 'ARCHIVED'
+        ];
+    }
+
 }

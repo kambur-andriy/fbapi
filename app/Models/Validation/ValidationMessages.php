@@ -19,7 +19,8 @@ class ValidationMessages
         'integer' => 'The %s field may contain only digits',
         'alpha' => 'The %s field may contain only letters',
         'confirmed' => 'The %s confirmation does not match',
-        'required_if' => 'The %s field is required'
+        'required_if' => 'The %s field is required',
+        'url' => 'The %s field is not a valid URL',
     ];
 
     /**
