@@ -6,7 +6,6 @@ use FacebookAds\Object\AdAccount;
 use FacebookAds\Object\Campaign;
 use FacebookAds\Object\Fields\CampaignFields;
 use FacebookAds\Object\Values\CampaignObjectiveValues;
-use FacebookAds\Object\Values\ArchivableCrudObjectEffectiveStatuses;
 
 class CampaignsAPI extends AdvertisingApi
 {
@@ -25,13 +24,6 @@ class CampaignsAPI extends AdvertisingApi
                 CampaignFields::NAME,
                 CampaignFields::OBJECTIVE,
                 CampaignFields::STATUS,
-            ],
-            [
-                CampaignFields::EFFECTIVE_STATUS =>
-                    [
-                        ArchivableCrudObjectEffectiveStatuses::ACTIVE,
-                        ArchivableCrudObjectEffectiveStatuses::PAUSED,
-                    ]
             ]
         );
 
@@ -75,9 +67,9 @@ class CampaignsAPI extends AdvertisingApi
      */
     public function deleteCampaign($campaign)
     {
-        $campaign = new Campaign($campaign);
+        $adCampaign = new Campaign($campaign);
 
-        $campaign->deleteSelf();
+        $adCampaign->deleteSelf();
     }
 
     /**

@@ -38,6 +38,7 @@ Route::group(['prefix' => 'user'], function () {
 
     Route::get('sets', 'UserController@sets');
     Route::post('set', 'UserController@createSet');
+    Route::post('set/delete', 'UserController@deleteSet');
 
     Route::get('creatives', 'UserController@creatives');
     Route::post('creative', 'UserController@createCreative');

@@ -40,11 +40,11 @@ class SetsAPI extends AdvertisingApi
 
     /**
      * Add new Ad Set
-     * 
+     *
      * @param $set
-     * 
+     *
      * @return AdSet
-     * 
+     *
      * @throws \Exception
      */
     public function addSet($set)
@@ -56,27 +56,39 @@ class SetsAPI extends AdvertisingApi
 
         $adSet->setData(
             [
+                AdSetFields::CAMPAIGN_ID => $set['campaign'],
+                AdSetFields::TARGETING => $targeting,
                 AdSetFields::NAME => $set['name'],
                 AdSetFields::OPTIMIZATION_GOAL => $set['optimization_goal'],
                 AdSetFields::BILLING_EVENT => $set['billing_event'],
                 AdSetFields::BID_AMOUNT => $set['bid_amount'],
                 AdSetFields::DAILY_BUDGET => $set['daily_budget'],
-                AdSetFields::CAMPAIGN_ID => $set['campaign'],
                 AdSetFields::START_TIME => (new \DateTime($set['start_date']))->format(DateTime::ISO8601),
                 AdSetFields::END_TIME => (new \DateTime($set['end_date']))->format(DateTime::ISO8601),
-                AdSetFields::TARGETING => $targeting,
             ]
         );
 
         $adSet->create(
             [
-                AdSet::STATUS_PARAM_NAME => AdSet::STATUS_PAUSED,
+                $set['status'],
             ]
         );
 
         return $adSet;
     }
 
+    /**
+     * Delete Ad Set
+     *
+     * @param string $set
+     *
+     * @throws \Exception
+     */
+    public function deleteSet($set)
+    {
+        $adSet = new AdSet($set);
+        $adSet->deleteSelf();
+    }
 
     /**
      * Define target interest
@@ -164,6 +176,21 @@ class SetsAPI extends AdvertisingApi
             AdSetBillingEventValues::MRC_VIDEO_VIEWS => 'MRC VIDEO VIEWS',
             AdSetBillingEventValues::COMPLETED_VIDEO_VIEWS => 'COMPLETED VIDEO VIEWS',
             AdSetBillingEventValues::VIDEO_VIEWS_15S => 'VIDEO VIEWS 15S',
+        ];
+    }
+
+    /**
+     * Get available set billing events
+     *
+     * @return array
+     */
+    public static function getSetStatuses()
+    {
+        return [
+            AdSet::STATUS_ACTIVE => 'ACTIVE',
+            AdSet::STATUS_PAUSED => 'PAUSED',
+            AdSet::STATUS_DELETED => 'DELETED',
+            AdSet::STATUS_ARCHIVED => 'ARCHIVED',
         ];
     }
 

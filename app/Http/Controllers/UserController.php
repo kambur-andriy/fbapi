@@ -308,14 +308,10 @@ class UserController extends Controller
             );
         }
 
-        $adApi = new CampaignsAPI($fbAccount->account_id, $fbAccount->account_token);
-        $adCampaigns = [];
+        $adApi = new CampaignsAPI($this->adAccountID, $fbAccount->account_token);
+        $adCampaigns = $adApi->getCampaigns();
 
-        foreach ($adApi->getCampaigns() as $adCampaign) {
-            $adCampaigns[$adCampaign->id] = $adCampaign->name;
-        }
-
-        $adApi = new SetsAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);
         $adSets = $adApi->getSets();
 
         return view(
@@ -323,6 +319,7 @@ class UserController extends Controller
             [
                 'optimizationGoals' => SetsAPI::getSetOptimizationGoals(),
                 'billingEvents' => SetsAPI::getSetBillingEvents(),
+                'statuses' => SetsAPI::getSetStatuses(),
                 'adCampaigns' => $adCampaigns,
                 'adSets' => $adSets,
             ]
@@ -350,6 +347,7 @@ class UserController extends Controller
                 'billing_event' => 'required|string',
                 'interest' => 'required|string',
                 'campaign' => 'required|string',
+                'status' => 'required|string',
             ],
             ValidationMessages::getList(
                 [
@@ -360,18 +358,17 @@ class UserController extends Controller
                     'daily_budget' => 'Daily Budget',
                     'optimization_goal' => 'Optimization Goal',
                     'billing_event' => 'Billing Event',
-                    'interest' => 'Interest',
+                    'interest' => 'Targeting Interest',
                     'campaign' => 'Campaign',
+                    'status' => 'Set Status',
                 ]
             )
         );
 
-        DB::beginTransaction();
-
         try {
             $fbAccount = $this->user->socialNetworkAccount;
 
-            if (!$fbAccount) {
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
                 throw new \Exception('Error creating Ad Set');
             }
 
@@ -385,14 +382,13 @@ class UserController extends Controller
                 'billing_event' => $request->input('billing_event'),
                 'interest' => $request->input('interest'),
                 'campaign' => $request->input('campaign'),
+                'status' => $request->input('status'),
             ];
 
-            $adApi = new SetsAPI($fbAccount->account_id, $fbAccount->account_token);
-            $adSet = $adApi->addSet($setInfo);
+            $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);
+            $adApi->addSet($setInfo);
 
         } catch (\Exception $e) {
-
-            DB::rollback();
 
             $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Set';
 
@@ -407,12 +403,64 @@ class UserController extends Controller
             );
         }
 
-        DB::commit();
-
         return response()->json(
-            $adSet
+            []
         );
 
+    }
+
+    /**
+     * Delete Ad Set
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function deleteSet(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'set' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'set' => 'Set',
+                ]
+            )
+        );
+
+        try {
+
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error deleting set');
+            }
+
+            $adSet = $request->input('set');
+
+            $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);;
+            $adApi->deleteSet($adSet);
+
+        } catch (\Exception $e) {
+
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad Set';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => [
+                        'name' => $message,
+                    ]
+                ],
+                422
+            );
+        }
+
+        return response()->json(
+            []
+        );
     }
 
     /**
@@ -425,13 +473,13 @@ class UserController extends Controller
         // Ad Account
         $fbAccount = $this->user->socialNetworkAccount;
 
-        if (is_null($fbAccount)) {
+        if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
             return view(
                 'user.no-account'
             );
         }
 
-        $adApi = new CreativesAPI($fbAccount->account_id, $fbAccount->account_token);
+        $adApi = new CreativesAPI($this->adAccountID, $fbAccount->account_token);
         $adCreatives = $adApi->getCreatives();
 
         return view(
@@ -471,12 +519,11 @@ class UserController extends Controller
             )
         );
 
-        DB::beginTransaction();
 
         try {
             $fbAccount = $this->user->socialNetworkAccount;
 
-            if (!$fbAccount) {
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
                 throw new \Exception('Error creating Ad Set');
             }
 
@@ -494,12 +541,10 @@ class UserController extends Controller
                 'image_path' => action('IndexController@creative', ['cin' => $newFileName]),
             ];
 
-            $adApi = new CreativesAPI($fbAccount->account_id, $fbAccount->account_token);
+            $adApi = new CreativesAPI($this->adAccountID, $fbAccount->account_token);
             $adApi->addCreative($creativeInfo);
 
         } catch (\Exception $e) {
-
-            DB::rollback();
 
 //            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Creative';
             $message = 'Error creating Ad Creative';
@@ -514,8 +559,6 @@ class UserController extends Controller
                 422
             );
         }
-
-        DB::commit();
 
         return response()->json(
             []

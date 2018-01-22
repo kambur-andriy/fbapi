@@ -19,8 +19,8 @@
                     <i class="material-icons prefix">chat_bubble_outline</i>
 
                     <select name="campaign">
-                        @foreach($adCampaigns as $adCampaignID => $adCampaign)
-                            <option value="{{ $adCampaignID }}">{{ $adCampaign }}</option>
+                        @foreach($adCampaigns as $adCampaign)
+                            <option value="{{ $adCampaign->id }}">{{ $adCampaign->name }}</option>
                         @endforeach
                     </select>
 
@@ -101,6 +101,20 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">chevron_right</i>
+
+                            <select name="status">
+                                @foreach($statuses as $statusID => $statusName)
+                                    <option value="{{ $statusID }}">{{ $statusName }}</option>
+                                @endforeach
+                            </select>
+
+                            <label for="status">Status</label>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -135,6 +149,7 @@
                 <th>Daily Budget</th>
                 <th>Campaign</th>
                 <th>Status</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -144,6 +159,11 @@
                     <td> {{ $adSet->daily_budget }} </td>
                     <td> {{ $adCampaigns[$adSet->campaign['id']] }} </td>
                     <td> {{ $adSet->status }} </td>
+                    <td>
+                        <a class="btn-floating btn-small waves-effect waves-light red right delete-set">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
                 </tr>
             @endforeach
             </tbody>

@@ -196,7 +196,7 @@ $(document).ready(function () {
         }
     );
 
-    // Delete Ad Company
+    // Delete Ad Campaign
     $('.delete-campaign').on(
         'click',
         function (event) {
@@ -237,7 +237,12 @@ $(document).ready(function () {
         function (event) {
             event.preventDefault();
 
+            const button = $(this).find('.btn');
+
+            startRequest(button);
+
             const credentials = {
+                campaign: $(this).find('select[name="campaign"]').val(),
                 name: $(this).find('input[name="name"]').val().trim(),
                 start_date: $(this).find('input[name="start_date"]').val(),
                 end_date: $(this).find('input[name="end_date"]').val(),
@@ -246,7 +251,7 @@ $(document).ready(function () {
                 optimization_goal: $(this).find('select[name="optimization_goal"]').val(),
                 billing_event: $(this).find('select[name="billing_event"]').val(),
                 interest: $(this).find('input[name="interest"]').val().trim(),
-                campaign: $(this).find('select[name="campaign"]').val(),
+                status: $(this).find('select[name="status"]').val(),
             };
 
             axios.post(
@@ -254,28 +259,51 @@ $(document).ready(function () {
                 qs.stringify(credentials)
             )
                 .then(
-                    response => {
+                    () => {
                         showMessage('Set successfully created.');
 
-                        $('ad_sets tbody').prepend(
-                            $('<tr />')
-                                .append(
-                                    $('<td />').html(response.data.name)
-                                )
-                                .append(
-                                    $('<td />').html(response.data.daily_budget)
-                                )
-                                .append(
-                                    $('<td />').html('')
-                                )
-                                .append(
-                                    $('<td />').html(response.data.status)
-                                )
-                        )
+                        stopRequest(button);
                     }
                 )
                 .catch(
                     error => {
+                        showErrors(error.response.data.errors)
+
+                        stopRequest(button);
+                    }
+                )
+        }
+    );
+
+    // Delete Ad Campaign
+    $('.delete-set').on(
+        'click',
+        function (event) {
+            event.preventDefault();
+
+            const button = $(this);
+
+            startRequest(button);
+
+            const credentials = {
+                set: $(this).parents('tr').attr('id'),
+            };
+
+            axios.post(
+                '/user/set/delete',
+                qs.stringify(credentials)
+            )
+                .then(
+                    () => {
+                        stopRequest(button);
+
+                        showMessage('Set successfully deleted.');
+                    }
+                )
+                .catch(
+                    error => {
+                        stopRequest(button);
+
                         showErrors(error.response.data.errors)
                     }
                 )

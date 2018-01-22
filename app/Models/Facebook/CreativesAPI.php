@@ -82,7 +82,6 @@ class CreativesAPI extends AdvertisingApi
     {
         $image = new AdImage(null, $this->accountID);
 
-        dd($imagePath);
         $image->{AdImageFields::FILENAME} = $imagePath;
 
         $image->create();
