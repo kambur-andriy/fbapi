@@ -43,6 +43,10 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('creatives', 'UserController@creatives');
     Route::post('creative', 'UserController@createCreative');
 
+    Route::get('ads', 'UserController@ads');
+    Route::post('ad', 'UserController@createAd');
+    Route::post('ad/delete', 'UserController@deleteAd');
+
 });
 
 

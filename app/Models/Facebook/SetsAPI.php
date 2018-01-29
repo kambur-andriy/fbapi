@@ -30,7 +30,7 @@ class SetsAPI extends AdvertisingApi
                 AdSetFields::ID,
                 AdSetFields::NAME,
                 AdSetFields::DAILY_BUDGET,
-                AdSetFields::CAMPAIGN,
+                AdSetFields::CAMPAIGN_ID,
                 AdSetFields::STATUS
             ]
         );
@@ -180,7 +180,7 @@ class SetsAPI extends AdvertisingApi
     }
 
     /**
-     * Get available set billing events
+     * Get available set statuses
      *
      * @return array
      */

@@ -16,7 +16,7 @@
             <div class="row">
 
                 <div class="input-field col s12 m12 l12 xl12">
-                    <i class="material-icons prefix">chat_bubble_outline</i>
+                    <i class="material-icons prefix">folder_open</i>
 
                     <select name="campaign">
                         @foreach($adCampaigns as $adCampaign)
@@ -24,7 +24,7 @@
                         @endforeach
                     </select>
 
-                    <label for="billing_event">Campaign</label>
+                    <label for="campaign">Campaign</label>
                 </div>
 
             </div>
@@ -35,7 +35,7 @@
 
                     <div class="row">
                         <div class="input-field col s12">
-                            <i class="material-icons prefix">chat_bubble</i>
+                            <i class="material-icons prefix">chat_bubble_outline</i>
                             <input name="name" type="text" class="validate">
                             <label for="name">Name</label>
                         </div>
@@ -157,7 +157,7 @@
                 <tr id="{{ $adSet->id }}">
                     <td> {{ $adSet->name }} </td>
                     <td> {{ $adSet->daily_budget }} </td>
-                    <td> {{ $adCampaigns[$adSet->campaign['id']] }} </td>
+                    <td> {{ $adSet->campaign_id }} </td>
                     <td> {{ $adSet->status }} </td>
                     <td>
                         <a class="btn-floating btn-small waves-effect waves-light red right delete-set">

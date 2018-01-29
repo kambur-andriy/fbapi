@@ -3,8 +3,8 @@
 @section('main-menu')
     <li><a href="profile">Profile</a></li>
     <li><a href="campaigns">Campaigns</a></li>
-    <li class="active"><a href="sets">Sets</a></li>
-    <li><a href="creatives">Creatives</a></li>
+    <li><a href="sets">Sets</a></li>
+    <li class="active"><a href="creatives">Creatives</a></li>
     <li><a href="ads">Ads</a></li>
 @endsection
 
@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">add_to_photos</i>
+                    <i class="material-icons prefix">camera_alt</i>
                     <input name="name" type="text" class="validate">
                     <label for="name">Name</label>
                 </div>

@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">chat_bubble_outline</i>
+                    <i class="material-icons prefix">folder_open</i>
                     <input name="name" type="text" class="validate">
                     <label for="name">Name</label>
                 </div>

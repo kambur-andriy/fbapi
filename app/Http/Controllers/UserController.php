@@ -14,6 +14,7 @@ use App\Models\DB\SocialNetworkAccount;
 use App\Models\DB\State;
 use App\Models\DB\User;
 use App\Models\DB\Verification;
+use App\Models\Facebook\AdsAPI;
 use App\Models\Facebook\AdvertisingApi;
 use App\Models\Facebook\CampaignsAPI;
 use App\Models\Facebook\CreativesAPI;
@@ -529,9 +530,9 @@ class UserController extends Controller
 
             $file = $request->file('image_file');
 
-            $newFileName = $fbAccount->account_id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $newFileName = uniqid() . '.' . $file->getClientOriginalExtension();
 
-            $file->storeAs('creatives', $newFileName);
+            $filePath = $file->storeAs('creatives', $newFileName);
 
             $creativeInfo = [
                 'name' => $request->input('name'),
@@ -539,15 +540,17 @@ class UserController extends Controller
                 'link' => $request->input('link'),
                 'message' => $request->input('message'),
                 'image_path' => action('IndexController@creative', ['cin' => $newFileName]),
+                'image_path' => storage_path('app/creatives/') . $newFileName,
             ];
 
             $adApi = new CreativesAPI($this->adAccountID, $fbAccount->account_token);
             $adApi->addCreative($creativeInfo);
 
+            Storage::delete($filePath);
+
         } catch (\Exception $e) {
 
-//            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Creative';
-            $message = 'Error creating Ad Creative';
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad Creative';
 
             return response()->json(
                 [
@@ -581,4 +584,160 @@ class UserController extends Controller
 
         return true;
     }
+
+    /**
+     * User Ads
+     *
+     * @return View
+     */
+    public function ads()
+    {
+        // Ad Account
+        $fbAccount = $this->user->socialNetworkAccount;
+
+        if (is_null($fbAccount)) {
+            return view(
+                'user.no-account'
+            );
+        }
+
+        $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);
+        $adSets = $adApi->getSets();
+
+        $adApi = new CreativesAPI($this->adAccountID, $fbAccount->account_token);
+        $adCreatives = $adApi->getCreatives();
+
+        $adApi = new AdsAPI($this->adAccountID, $fbAccount->account_token);
+        $ads = $adApi->getAds();
+
+        return view(
+            'user.ads',
+            [
+                'statuses' => AdsAPI::getAdStatuses(),
+                'adSets' => $adSets,
+                'adCreatives' => $adCreatives,
+                'ads' => $ads
+            ]
+        );
+    }
+
+    /**
+     * Create Ad
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function createAd(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'set' => 'required|string',
+                'creative' => 'required|string',
+                'name' => 'required|string',
+                'status' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'set' => 'Set',
+                    'creative' => 'Creative',
+                    'name' => 'Ad Name',
+                    'status' => 'Set Status',
+                ]
+            )
+        );
+
+        try {
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error creating Ad Set');
+            }
+
+            $adInfo = [
+                'set' => $request->input('set'),
+                'creative' => $request->input('creative'),
+                'name' => $request->input('name'),
+                'status' => $request->input('status'),
+            ];
+
+            $adApi = new AdsAPI($this->adAccountID, $fbAccount->account_token);
+            $adApi->addAd($adInfo);
+
+        } catch (\Exception $e) {
+
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error creating Ad';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => [
+                        'name' => $message,
+                    ]
+                ],
+                422
+            );
+        }
+
+        return response()->json(
+            []
+        );
+
+    }
+
+    /**
+     * Delete Ad
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function deleteAd(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'set' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'set' => 'Set',
+                ]
+            )
+        );
+
+        try {
+
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error deleting set');
+            }
+
+            $adSet = $request->input('set');
+
+            $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);;
+            $adApi->deleteSet($adSet);
+
+        } catch (\Exception $e) {
+
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad Set';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => [
+                        'name' => $message,
+                    ]
+                ],
+                422
+            );
+        }
+
+        return response()->json(
+            []
+        );
+    }
+
 }
