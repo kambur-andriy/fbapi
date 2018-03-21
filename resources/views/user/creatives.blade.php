@@ -68,29 +68,39 @@
 
     </div>
 
-    {{--<div class="section">--}}
+    <div class="section">
 
-        {{--<table id="ad_sets" class="highlight">--}}
-            {{--<thead>--}}
-            {{--<tr>--}}
-                {{--<th>Name</th>--}}
-                {{--<th>Daily Budget</th>--}}
-                {{--<th>Campaign</th>--}}
-                {{--<th>Status</th>--}}
-            {{--</tr>--}}
-            {{--</thead>--}}
-            {{--<tbody>--}}
-            {{--@foreach($adSets as $adSet)--}}
-                {{--<tr id="{{ $adSet->id }}">--}}
-                    {{--<td> {{ $adSet->name }} </td>--}}
-                    {{--<td> {{ $adSet->daily_budget }} </td>--}}
-                    {{--<td> {{ $adCampaigns[$adSet->campaign['id']] }} </td>--}}
-                    {{--<td> {{ $adSet->status }} </td>--}}
-                {{--</tr>--}}
-            {{--@endforeach--}}
-            {{--</tbody>--}}
-        {{--</table>--}}
+        <table id="ad_sets" class="highlight">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Thumbnail</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($creatives as $adCreative)
+                <tr id="{{ $adCreative->id }}">
+                    <td> {{ $adCreative->name }} </td>
+                    <td>
+                        <img src="{{ $adCreative->thumbnail_url }}"/>
+                    </td>
+                    <td>
+                        <a class="btn-floating btn-small waves-effect waves-light red right delete-creative">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
 
-    {{--</div>--}}
+    </div>
+
+@endsection
+
+@section('scripts')
+
+    <script src="/js/user_creatives.js" type="text/javascript"></script>
 
 @endsection

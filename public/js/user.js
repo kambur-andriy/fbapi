@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 40);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,8 +70,8 @@
 "use strict";
 
 
-var bind = __webpack_require__(2);
-var isBuffer = __webpack_require__(16);
+var bind = __webpack_require__(3);
+var isBuffer = __webpack_require__(17);
 
 /*global toString:true*/
 
@@ -381,7 +381,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(19);
+var normalizeHeaderName = __webpack_require__(20);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -397,10 +397,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(3);
+    adapter = __webpack_require__(4);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(3);
+    adapter = __webpack_require__(4);
   }
   return adapter;
 }
@@ -471,10 +471,75 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+
+// Message
+window.showMessage = function (message) {
+    var complete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        window.location.reload();
+    };
+
+    var modal = $('<div />').attr('id', 'custom-message').addClass('modal').append($('<div />').addClass('modal-content').html(message)).append($('<div />').addClass('modal-footer').append($('<a />').addClass('modal-action modal-close btn waves-effect waves-light grey').html('Close')));
+
+    $('body').append(modal);
+
+    $('#custom-message').modal({
+        dismissible: true,
+        complete: complete
+    });
+
+    $('#custom-message').modal('open');
+};
+
+// Errors
+window.showError = function (errorMessage) {
+    Materialize.toast(errorMessage, 10000);
+};
+
+window.showErrors = function (errorsList) {
+    $.each(errorsList, function (field, error) {
+        if (error.length) {
+            showError(error);
+        }
+    });
+};
+
+// Process request
+window.getSpinner = function () {
+    return $('<i />').addClass('material-icons right spinner').html('cached');
+};
+
+window.startRequest = function (button) {
+    var withSpinner = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    if (button.hasClass('btn-floating')) {
+        button.find('.material-icons').hide();
+    }
+
+    button.prop('disabled', true);
+
+    if (withSpinner === true) {
+        button.append(getSpinner());
+    }
+};
+
+window.stopRequest = function (button) {
+    if (button.hasClass('btn-floating')) {
+        button.find('.material-icons:hidden').show();
+    }
+
+    button.prop('disabled', false);
+
+    $('.spinner').remove();
+};
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -492,19 +557,19 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(20);
-var buildURL = __webpack_require__(22);
-var parseHeaders = __webpack_require__(23);
-var isURLSameOrigin = __webpack_require__(24);
-var createError = __webpack_require__(4);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(25);
+var settle = __webpack_require__(21);
+var buildURL = __webpack_require__(23);
+var parseHeaders = __webpack_require__(24);
+var isURLSameOrigin = __webpack_require__(25);
+var createError = __webpack_require__(5);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(26);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -601,7 +666,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(26);
+      var cookies = __webpack_require__(27);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -679,13 +744,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(21);
+var enhanceError = __webpack_require__(22);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -704,7 +769,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -716,7 +781,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -742,7 +807,7 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -951,7 +1016,7 @@ exports.isBuffer = function isBuffer(obj) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -976,16 +1041,16 @@ module.exports = {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window._ = __webpack_require__(10);
+window._ = __webpack_require__(11);
 
 try {
-    window.$ = window.jQuery = __webpack_require__(13);
+    window.$ = window.jQuery = __webpack_require__(14);
 } catch (e) {}
 
-window.axios = __webpack_require__(14);
+window.axios = __webpack_require__(15);
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -997,10 +1062,10 @@ if (token) {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
-window.qs = __webpack_require__(34);
+window.qs = __webpack_require__(35);
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18089,10 +18154,10 @@ window.qs = __webpack_require__(34);
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(12)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(13)(module)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 var g;
@@ -18119,7 +18184,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -18147,7 +18212,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -28407,21 +28472,21 @@ return jQuery;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(15);
+module.exports = __webpack_require__(16);
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(2);
-var Axios = __webpack_require__(17);
+var bind = __webpack_require__(3);
+var Axios = __webpack_require__(18);
 var defaults = __webpack_require__(1);
 
 /**
@@ -28455,15 +28520,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(6);
-axios.CancelToken = __webpack_require__(32);
-axios.isCancel = __webpack_require__(5);
+axios.Cancel = __webpack_require__(7);
+axios.CancelToken = __webpack_require__(33);
+axios.isCancel = __webpack_require__(6);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(33);
+axios.spread = __webpack_require__(34);
 
 module.exports = axios;
 
@@ -28472,7 +28537,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /*!
@@ -28499,7 +28564,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28507,8 +28572,8 @@ function isSlowBuffer (obj) {
 
 var defaults = __webpack_require__(1);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(27);
-var dispatchRequest = __webpack_require__(28);
+var InterceptorManager = __webpack_require__(28);
+var dispatchRequest = __webpack_require__(29);
 
 /**
  * Create a new instance of Axios
@@ -28585,7 +28650,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -28775,7 +28840,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28794,13 +28859,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(4);
+var createError = __webpack_require__(5);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -28827,7 +28892,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28855,7 +28920,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28930,7 +28995,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28990,7 +29055,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29065,7 +29130,7 @@ module.exports = (
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29108,7 +29173,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29168,7 +29233,7 @@ module.exports = (
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29227,18 +29292,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(29);
-var isCancel = __webpack_require__(5);
+var transformData = __webpack_require__(30);
+var isCancel = __webpack_require__(6);
 var defaults = __webpack_require__(1);
-var isAbsoluteURL = __webpack_require__(30);
-var combineURLs = __webpack_require__(31);
+var isAbsoluteURL = __webpack_require__(31);
+var combineURLs = __webpack_require__(32);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -29320,7 +29385,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29347,7 +29412,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29368,7 +29433,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29389,13 +29454,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(6);
+var Cancel = __webpack_require__(7);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -29453,7 +29518,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29487,15 +29552,15 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var stringify = __webpack_require__(35);
-var parse = __webpack_require__(36);
-var formats = __webpack_require__(8);
+var stringify = __webpack_require__(36);
+var parse = __webpack_require__(37);
+var formats = __webpack_require__(9);
 
 module.exports = {
     formats: formats,
@@ -29505,14 +29570,14 @@ module.exports = {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(7);
-var formats = __webpack_require__(8);
+var utils = __webpack_require__(8);
+var formats = __webpack_require__(9);
 
 var arrayPrefixGenerators = {
     brackets: function brackets(prefix) { // eslint-disable-line func-name-matching
@@ -29722,13 +29787,13 @@ module.exports = function (object, opts) {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(7);
+var utils = __webpack_require__(8);
 
 var has = Object.prototype.hasOwnProperty;
 
@@ -29903,80 +29968,21 @@ module.exports = function (str, opts) {
 
 
 /***/ }),
-/* 37 */,
 /* 38 */,
 /* 39 */,
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(41);
-
-
-/***/ }),
+/* 40 */,
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(9);
+module.exports = __webpack_require__(42);
 
-// Message
-var showMessage = function showMessage(message) {
-    var complete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-        window.location.reload();
-    };
 
-    var modal = $('<div />').attr('id', 'custom-message').addClass('modal').append($('<div />').addClass('modal-content').html(message)).append($('<div />').addClass('modal-footer').append($('<a />').addClass('modal-action modal-close btn waves-effect waves-light grey').html('Close')));
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
 
-    $('body').append(modal);
-
-    $('#custom-message').modal({
-        dismissible: true,
-        complete: complete
-    });
-
-    $('#custom-message').modal('open');
-};
-
-// Errors
-var showError = function showError(errorMessage) {
-    Materialize.toast(errorMessage, 10000);
-};
-
-var showErrors = function showErrors(errorsList) {
-    $.each(errorsList, function (field, error) {
-        if (error.length) {
-            showError(error);
-        }
-    });
-};
-
-// Process request
-var getSpinner = function getSpinner() {
-    return $('<i />').addClass('material-icons right spinner').html('cached');
-};
-
-var startRequest = function startRequest(button) {
-    var withSpinner = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-    if (button.hasClass('btn-floating')) {
-        button.find('.material-icons').hide();
-    }
-
-    button.prop('disabled', true);
-
-    if (withSpinner === true) {
-        button.append(getSpinner());
-    }
-};
-
-var stopRequest = function stopRequest(button) {
-    if (button.hasClass('btn-floating')) {
-        button.find('.material-icons:hidden').show();
-    }
-
-    button.prop('disabled', false);
-
-    $('.spinner').remove();
-};
+__webpack_require__(10);
+__webpack_require__(2);
 
 $(document).ready(function () {
     // Selects
@@ -30001,202 +30007,6 @@ $(document).ready(function () {
             window.location.pathname = '/';
         }).catch(function () {
             return showError('Can not log out.');
-        });
-    });
-
-    // Save profile
-    $('#profile_form').on('submit', function (event) {
-        event.preventDefault();
-
-        var button = $(this).find('.btn');
-
-        startRequest(button, false);
-
-        var credentials = {
-            ad_account_id: $(this).find('input[name="ad_account_id"]').val(),
-            first_name: $(this).find('input[name="first_name"]').val(),
-            last_name: $(this).find('input[name="last_name"]').val()
-        };
-
-        axios.post('/user/profile', qs.stringify(credentials)).then(function () {
-            stopRequest(button);
-
-            showMessage('Profile successfully saved');
-        }).catch(function (error) {
-            stopRequest(button);
-
-            showErrors(error.response.data.errors);
-        });
-    });
-
-    // Create Ad Company
-    $('#campaign_form').on('submit', function (event) {
-        event.preventDefault();
-
-        var button = $(this).find('.btn');
-
-        startRequest(button);
-
-        var credentials = {
-            name: $(this).find('input[name="name"]').val().trim(),
-            objective: $(this).find('select[name="objective"]').val(),
-            status: $(this).find('select[name="status"]').val()
-        };
-
-        axios.post('/user/campaign', qs.stringify(credentials)).then(function () {
-            stopRequest(button);
-
-            showMessage('Campaign successfully saved.');
-        }).catch(function (error) {
-            stopRequest(button);
-
-            showErrors(error.response.data.errors);
-        });
-    });
-
-    // Delete Ad Campaign
-    $('.delete-campaign').on('click', function (event) {
-        event.preventDefault();
-
-        var button = $(this);
-
-        startRequest(button);
-
-        var credentials = {
-            campaign: $(this).parents('tr').attr('id')
-        };
-
-        axios.post('/user/campaign/delete', qs.stringify(credentials)).then(function () {
-            stopRequest(button);
-
-            showMessage('Campaign successfully deleted.');
-        }).catch(function (error) {
-            stopRequest(button);
-
-            showErrors(error.response.data.errors);
-        });
-    });
-
-    // Ad Set
-    $('#set_form').on('submit', function (event) {
-        event.preventDefault();
-
-        var button = $(this).find('.btn');
-
-        startRequest(button);
-
-        var credentials = {
-            campaign: $(this).find('select[name="campaign"]').val(),
-            name: $(this).find('input[name="name"]').val().trim(),
-            start_date: $(this).find('input[name="start_date"]').val(),
-            end_date: $(this).find('input[name="end_date"]').val(),
-            bid_amount: $(this).find('input[name="bid_amount"]').val().trim(),
-            daily_budget: $(this).find('input[name="daily_budget"]').val().trim(),
-            optimization_goal: $(this).find('select[name="optimization_goal"]').val(),
-            billing_event: $(this).find('select[name="billing_event"]').val(),
-            interest: $(this).find('input[name="interest"]').val().trim(),
-            status: $(this).find('select[name="status"]').val()
-        };
-
-        axios.post('/user/set', qs.stringify(credentials)).then(function () {
-            showMessage('Set successfully created.');
-
-            stopRequest(button);
-        }).catch(function (error) {
-            showErrors(error.response.data.errors);
-
-            stopRequest(button);
-        });
-    });
-
-    // Delete Ad Set
-    $('.delete-set').on('click', function (event) {
-        event.preventDefault();
-
-        var button = $(this);
-
-        startRequest(button);
-
-        var credentials = {
-            set: $(this).parents('tr').attr('id')
-        };
-
-        axios.post('/user/set/delete', qs.stringify(credentials)).then(function () {
-            stopRequest(button);
-
-            showMessage('Set successfully deleted.');
-        }).catch(function (error) {
-            stopRequest(button);
-
-            showErrors(error.response.data.errors);
-        });
-    });
-
-    // Ad Creative
-    $('#creative_form').on('submit', function (event) {
-        event.preventDefault();
-
-        var credentials = new FormData();
-
-        credentials.append('name', $(this).find('input[name="name"]').val().trim());
-        credentials.append('page', $(this).find('input[name="page"]').val().trim());
-        credentials.append('link', $(this).find('input[name="link"]').val().trim());
-        credentials.append('message', $(this).find('input[name="message"]').val().trim());
-        credentials.append('image_file', $('input[name="image_file"]')[0].files[0]);
-
-        axios.post('/user/creative', credentials).then(function () {
-            showMessage('Creative successfully created.');
-        }).catch(function (error) {
-            showErrors(error.response.data.errors);
-        });
-    });
-
-    // Ad
-    $('#ad_form').on('submit', function (event) {
-        event.preventDefault();
-
-        var button = $(this).find('.btn');
-
-        startRequest(button);
-
-        var credentials = {
-            set: $(this).find('select[name="set"]').val(),
-            creative: $(this).find('select[name="creative"]').val(),
-            name: $(this).find('input[name="name"]').val().trim(),
-            status: $(this).find('select[name="status"]').val()
-        };
-
-        axios.post('/user/ad', qs.stringify(credentials)).then(function () {
-            showMessage('Ad successfully created.');
-
-            stopRequest(button);
-        }).catch(function (error) {
-            showErrors(error.response.data.errors);
-
-            stopRequest(button);
-        });
-    });
-
-    // Delete Ad
-    $('.delete-ad').on('click', function (event) {
-        event.preventDefault();
-
-        var button = $(this);
-
-        startRequest(button);
-
-        var credentials = {
-            ad: $(this).parents('tr').attr('id')
-        };
-
-        axios.post('/user/ad/delete', qs.stringify(credentials)).then(function () {
-            stopRequest(button);
-
-            showMessage('Ad successfully deleted.');
-        }).catch(function (error) {
-            stopRequest(button);
-
-            showErrors(error.response.data.errors);
         });
     });
 });

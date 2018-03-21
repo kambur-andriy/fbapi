@@ -276,9 +276,7 @@ class UserController extends Controller
             return response()->json(
                 [
                     'message' => $message,
-                    'errors' => [
-                        'name' => $message,
-                    ]
+                    'errors' => []
                 ],
                 422
             );
@@ -339,6 +337,7 @@ class UserController extends Controller
         $this->validate(
             $request,
             [
+                'campaign' => 'required|string',
                 'name' => 'required|string',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
@@ -346,12 +345,16 @@ class UserController extends Controller
                 'daily_budget' => 'required|integer',
                 'optimization_goal' => 'required|string',
                 'billing_event' => 'required|string',
-                'interest' => 'required|string',
-                'campaign' => 'required|string',
                 'status' => 'required|string',
+
+                'age_min' => 'required|integer',
+                'age_max' => 'required|integer',
+                'gender' => 'required|integer',
+                'interest' => 'required|string',
             ],
             ValidationMessages::getList(
                 [
+                    'campaign' => 'Campaign',
                     'name' => 'Set Name',
                     'start_date' => 'Start Date',
                     'end_date' => 'End Date',
@@ -359,9 +362,12 @@ class UserController extends Controller
                     'daily_budget' => 'Daily Budget',
                     'optimization_goal' => 'Optimization Goal',
                     'billing_event' => 'Billing Event',
-                    'interest' => 'Targeting Interest',
-                    'campaign' => 'Campaign',
                     'status' => 'Set Status',
+
+                    'age_min' => 'Age Min',
+                    'age_max' => 'Age Max',
+                    'gender' => 'Gender',
+                    'interest' => 'Interest',
                 ]
             )
         );
@@ -374,6 +380,7 @@ class UserController extends Controller
             }
 
             $setInfo = [
+                'campaign' => $request->input('campaign'),
                 'name' => $request->input('name'),
                 'start_date' => $request->input('start_date'),
                 'end_date' => $request->input('end_date'),
@@ -381,9 +388,13 @@ class UserController extends Controller
                 'daily_budget' => $request->input('daily_budget'),
                 'optimization_goal' => $request->input('optimization_goal'),
                 'billing_event' => $request->input('billing_event'),
-                'interest' => $request->input('interest'),
-                'campaign' => $request->input('campaign'),
                 'status' => $request->input('status'),
+                'targeting' => [
+                    'age_min' => $request->input('age_min'),
+                    'age_max' => $request->input('age_max'),
+                    'gender' => $request->input('gender'),
+                    'interest' => $request->input('interest'),
+                ]
             ];
 
             $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);
@@ -451,9 +462,7 @@ class UserController extends Controller
             return response()->json(
                 [
                     'message' => $message,
-                    'errors' => [
-                        'name' => $message,
-                    ]
+                    'errors' => []
                 ],
                 422
             );
@@ -504,7 +513,7 @@ class UserController extends Controller
             $request,
             [
                 'name' => 'required|string',
-                'page' => 'required|string',
+                'page' => 'string|required_without_all:page,link,message',
                 'link' => 'required|url',
                 'message' => 'required|string',
                 'image_file' => 'file|max:2048|mimetypes:image/jpeg,image/png',
@@ -519,7 +528,6 @@ class UserController extends Controller
                 ]
             )
         );
-
 
         try {
             $fbAccount = $this->user->socialNetworkAccount;
@@ -539,7 +547,6 @@ class UserController extends Controller
                 'page' => $request->input('page'),
                 'link' => $request->input('link'),
                 'message' => $request->input('message'),
-                'image_path' => action('IndexController@creative', ['cin' => $newFileName]),
                 'image_path' => storage_path('app/creatives/') . $newFileName,
             ];
 
@@ -570,6 +577,58 @@ class UserController extends Controller
     }
 
     /**
+     * Delete Ad Creative
+     *
+     * @param Request $request
+     *
+     * @return JSON
+     */
+    public function deleteCreative(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'creative' => 'required|string',
+            ],
+            ValidationMessages::getList(
+                [
+                    'creative' => 'Creative',
+                ]
+            )
+        );
+
+        try {
+
+            $fbAccount = $this->user->socialNetworkAccount;
+
+            if (!$this->canUseAPI($this->adAccountID, $fbAccount)) {
+                throw new \Exception('Error deleting creative');
+            }
+
+            $adCreative = $request->input('creative');
+
+            $adApi = new CreativesAPI($this->adAccountID, $fbAccount->account_token);;
+            $adApi->deleteCreative($adCreative);
+
+        } catch (\Exception $e) {
+
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad Creative';
+
+            return response()->json(
+                [
+                    'message' => $message,
+                    'errors' => []
+                ],
+                422
+            );
+        }
+
+        return response()->json(
+            []
+        );
+    }
+
+    /**
      * Check if FB Account exist and Ad Account ID is not empty
      *
      * @param string $adAccountID
@@ -577,7 +636,8 @@ class UserController extends Controller
      *
      * @return bool
      */
-    protected function canUseAPI($adAccountID, $fbAccount) {
+    protected function canUseAPI($adAccountID, $fbAccount)
+    {
         if (is_null($fbAccount) || is_null($this->adAccountID)) {
             return false;
         }
@@ -698,11 +758,11 @@ class UserController extends Controller
         $this->validate(
             $request,
             [
-                'set' => 'required|string',
+                'ad' => 'required|string',
             ],
             ValidationMessages::getList(
                 [
-                    'set' => 'Set',
+                    'ad' => 'Ad',
                 ]
             )
         );
@@ -715,21 +775,19 @@ class UserController extends Controller
                 throw new \Exception('Error deleting set');
             }
 
-            $adSet = $request->input('set');
+            $adAd = $request->input('ad');
 
-            $adApi = new SetsAPI($this->adAccountID, $fbAccount->account_token);;
-            $adApi->deleteSet($adSet);
+            $adApi = new AdsAPI($this->adAccountID, $fbAccount->account_token);;
+            $adApi->deleteAd($adAd);
 
         } catch (\Exception $e) {
 
-            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad Set';
+            $message = ($e instanceof AuthorizationException) ? $e->getErrorUserMessage() : 'Error deleting Ad';
 
             return response()->json(
                 [
                     'message' => $message,
-                    'errors' => [
-                        'name' => $message,
-                    ]
+                    'errors' => []
                 ],
                 422
             );

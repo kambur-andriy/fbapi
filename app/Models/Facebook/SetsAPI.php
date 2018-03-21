@@ -13,7 +13,6 @@ use FacebookAds\Object\Fields\TargetingFields;
 use FacebookAds\Object\AdAccount;
 use DateTime;
 
-
 class SetsAPI extends AdvertisingApi
 {
     /**
@@ -49,8 +48,7 @@ class SetsAPI extends AdvertisingApi
      */
     public function addSet($set)
     {
-        $targetingInterest = $this->defineInterest($set['interest']);
-        $targeting = $this->defineTargeting($targetingInterest);
+        $targeting = $this->defineTargeting($set['targeting']);
 
         $adSet = new AdSet(null, $this->accountID);
 
@@ -96,7 +94,7 @@ class SetsAPI extends AdvertisingApi
      * @param $interest
      * @return \FacebookAds\Cursor
      */
-    protected function defineInterest($interest)
+    protected function defineInterests($interest)
     {
         return TargetingSearch::search(
             TargetingSearchTypes::INTEREST,
@@ -108,22 +106,33 @@ class SetsAPI extends AdvertisingApi
     /**
      * Define Targeting
      *
-     * @param \FacebookAds\Cursor $targetInterest
+     * @param array
      *
      * @return Targeting
      */
-    protected function defineTargeting($targetInterest)
+    protected function defineTargeting($targeting)
     {
-        $targeting = new Targeting();
+        $adTargeting = new Targeting();
 
-        $targeting->{TargetingFields::INTERESTS} = $targetInterest;
-
-        $targeting->{TargetingFields::GEO_LOCATIONS} =
+        // Geolocation
+        $adTargeting->{TargetingFields::GEO_LOCATIONS} =
             [
-                'countries' => ['US']
+                'countries' => ['DE']
             ];
 
-        return $targeting;
+        // Genders
+        $adTargeting->{TargetingFields::GENDERS} =
+            [
+                $targeting['gender']
+            ];
+
+        // Age
+        $adTargeting->{TargetingFields::AGE_MIN} = $targeting['age_min'];
+        $adTargeting->{TargetingFields::AGE_MAX} = $targeting['age_max'];
+
+        $adTargeting->{TargetingFields::INTERESTS} = $this->defineInterests($targeting['interest']);
+
+        return $adTargeting;
     }
 
     /**

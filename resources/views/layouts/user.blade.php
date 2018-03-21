@@ -38,10 +38,12 @@
 
 </div>
 
-
 <!-- JS scripts -->
 <script src="/js/user.js" type="text/javascript"></script>
 <script src="/js/materialize.min.js" type="text/javascript"></script>
+
+@yield('scripts')
+
 
 </body>
 </html>

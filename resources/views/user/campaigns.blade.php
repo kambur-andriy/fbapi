@@ -89,3 +89,9 @@
     </div>
 
 @endsection
+
+@section('scripts')
+
+    <script src="/js/user_campaigns.js" type="text/javascript"></script>
+
+@endsection

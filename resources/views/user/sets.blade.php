@@ -121,14 +121,56 @@
                 <div class="col s12 m12 l6 xl6">
 
                     <div class="row">
+                        <div class="input-field col s6">
+                            <select name="age_min">
+                                @for ($i = 13; $i <= 65; $i++)
+                                    <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </select>
+
+                            <label for="age_min">Age Min</label>
+                        </div>
+
+                        <div class="input-field col s6">
+                            <select name="age_max">
+                                @for ($i = 13; $i <= 65; $i++)
+                                    <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </select>
+
+                            <label for="age_max">Age Max</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s4">
+                            <input name="gender" id="g_all" type="radio" class="with-gap" value="0" checked>
+                            <label for="g_all">All Genders</label>
+                        </div>
+
+                        <div class="col s4">
+                            <input name="gender" id="g_men" type="radio" class="with-gap" value="1">
+                            <label for="g_men">Men</label>
+                        </div>
+
+                        <div class="col s4">
+                            <input id="g_women" name="gender" type="radio" class="with-gap" value="2">
+                            <label for="g_women">Women</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="input-field col s12">
-                            <i class="material-icons prefix">gps_fixed</i>
                             <input name="interest" type="text" class="validate">
-                            <label for="name">Targeting Interest</label>
+                            <label for="name">Interest</label>
                         </div>
                     </div>
 
                 </div>
+
+                </div>
+
+            </div>
 
             </div>
 
@@ -170,5 +212,11 @@
         </table>
 
     </div>
+
+@endsection
+
+@section('scripts')
+
+    <script src="/js/user_sets.js" type="text/javascript"></script>
 
 @endsection

@@ -106,3 +106,9 @@
     </div>
 
 @endsection
+
+@section('scripts')
+
+    <script src="/js/user_ads.js" type="text/javascript"></script>
+
+@endsection

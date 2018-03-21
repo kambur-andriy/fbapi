@@ -26,7 +26,7 @@ class CreativesAPI extends AdvertisingApi
         $adCreatives = $account->getAdCreatives(array(
             AdCreativeFields::ID,
             AdCreativeFields::NAME,
-            AdCreativeFields::THUMBNAIL_URL
+            AdCreativeFields::THUMBNAIL_URL,
         ));
 
         return $adCreatives;
@@ -88,4 +88,18 @@ class CreativesAPI extends AdvertisingApi
 
         return $image->{AdImageFields::HASH};
     }
+
+    /**
+     * Delete Creative
+     *
+     * @param string $creative
+     *
+     * @throws \Exception
+     */
+    public function deleteCreative($creative)
+    {
+        $adCreative = new AdCreative($creative);
+        $adCreative->deleteSelf();
+    }
+
 }
